@@ -109,4 +109,12 @@ class Process(object):
     
     def get_tau(self):
         return self.tau
-        
+          
+    def get_ID(self):
+        return self.ID    
+
+    def get_wait_time(self):
+        return self.wait_time
+    
+    def get_turnaround_time(self):
+        return self.turnaround_time
