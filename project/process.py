@@ -20,10 +20,10 @@ class Process(object):
         if len(self.cpu_burst_list) != 1:
                 s = "s"
         text = "{} process {}: arrival time {}ms; {} CPU burst{}:".format(self.ID, self.pid, self.arrival_time, len(self.cpu_burst_list), s) #for part 1 add \n behind :
-        for i in range(len(self.io_burst_list)):
-            text += "--> CPU burst {}ms ".format(self.cpu_burst_list[i])
-            text += "--> I/O burst {}ms\n".format(self.io_burst_list[i])      #this is for project part 1 output
-        text += "--> CPU burst {}ms".format(self.cpu_burst_list[-1])
+        # for i in range(len(self.io_burst_list)):
+        #     text += "--> CPU burst {}ms ".format(self.cpu_burst_list[i])
+        #     text += "--> I/O burst {}ms\n".format(self.io_burst_list[i])      #this is for project part 1 output
+        # text += "--> CPU burst {}ms".format(self.cpu_burst_list[-1])
         return text
     
     #Below is the burst setter for the class
