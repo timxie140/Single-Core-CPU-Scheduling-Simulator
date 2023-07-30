@@ -1,5 +1,5 @@
 from copy import deepcopy
-from process import Process
+
 
 def print_ready_Q(ready_Q):
     if len(ready_Q) != 0:
