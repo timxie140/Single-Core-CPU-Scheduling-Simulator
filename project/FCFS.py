@@ -11,6 +11,19 @@ def print_ready_Q(ready_Q):
         text = "[Q <empty>]"
     return text
 
+#function to consider the process in I/O to end when context switching
+def during_ctx(io_list, time, ready_Q, half_t_cs):
+    for i in range(half_t_cs):
+        if len(io_list) != 0 and io_list[0].get_io_burst_stop_time() == time + i:
+            io_p = io_list.pop(0)
+            ready_Q.append(io_p)    
+            io_p.change_io_burst()
+            if time < 10000:
+                print("time {}ms: Process {} completed I/O; added to ready queue {}".format(time, io_p.get_pid(), print_ready_Q(ready_Q)))
+            #When a process is added to the ready queue, set the wait start time
+            io_p.set_wait_start(time)
+    return io_list, ready_Q
+
 #function of the full FCFS algorithm
 def FCFS (process_list, t_cs):
     #Below is the variables used in the algo
@@ -29,11 +42,14 @@ def FCFS (process_list, t_cs):
     fcfs_total_cpu_burst_times = 0
     fcfs_total_cpu_elapsed_time = 0
     fcfs_total_io_elapsed_time = 0
+
     context_switch = 0
     io_context_switch = 0
     cpu_context_switch = 0
+    
     iobound_burst_times = 0
     cpubound_burst_times = 0
+
     fcfs_iobound_cpu_burst_time = 0
     fcfs_cpubound_cpu_burst_time = 0
     fcfs_iobound_io_burst_time = 0
@@ -88,6 +104,7 @@ def FCFS (process_list, t_cs):
                     cpu_context_switch += 0.5
                 else:
                     io_context_switch += 0.5
+                io_list, ready_Q = during_ctx(io_list, time, ready_Q, half_t_cs)
                 time += half_t_cs
                 #Set the turnaround end time and calculate the turnaround time
                 cpu_p.set_turnaround_end(time)
@@ -111,6 +128,7 @@ def FCFS (process_list, t_cs):
                 else:
                     io_context_switch += 0.5
                 if ready_Q and ready_Q[0].get_pid() != io_p.get_pid():
+                    io_list, ready_Q = during_ctx(io_list, time, ready_Q, half_t_cs)
                     time += half_t_cs
         
         #Determine if a io burst is finished, since the io list is sorted, 
@@ -129,6 +147,7 @@ def FCFS (process_list, t_cs):
             #when the process is taking out of the ready queue, set the wait end time and calculate the wait time
             cpu_p.set_wait_end(time)
             cpu_p.cal_wait_time()
+            io_list, ready_Q = during_ctx(io_list, time, ready_Q, half_t_cs)
             time += half_t_cs
             #when process is switching into CPU context switch happens, the second half of the context switch is done
             context_switch += 0.5
@@ -144,7 +163,7 @@ def FCFS (process_list, t_cs):
 
         if alive_process != 0:    
             time += 1
-    print("time {}ms: Simulator ended for FCFS".format(time))
+    print("time {}ms: Simulator ended for FCFS\n".format(time))
 
     #Calculate all data needed for the output file, will use the variable created before algo simulation
     fcfs_cpu_utilization = (fcfs_total_cpu_elapsed_time / time) * 100                                                          

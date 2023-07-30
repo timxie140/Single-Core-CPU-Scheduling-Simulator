@@ -117,3 +117,20 @@ class Process(object):
     
     def get_turnaround_time(self):
         return self.turnaround_time
+    
+    #Below are getter/setter specific for RR algo
+    #setter
+    def set_slice_stop_time(self, slice_stop_time):
+        self.slice_stop_time = slice_stop_time
+
+    def add_single_cpu_burst_remaining(self, cpu_burst):
+        self.remaining_time = cpu_burst
+    
+    #getter
+    def get_expire(self, time):
+        if time == self.slice_stop_time:
+            return True
+        return False
+
+    def get_remaining_time(self):
+        return self.remaining_time
