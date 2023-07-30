@@ -14,18 +14,38 @@ def print_ready_Q(ready_Q):
         text = "[Q <empty>]"
     return text
 
-def find_shortest_burst(Q):
+def find_shortest_tau(Q):
     mini = float('inf')
     process_index = 0
     for i in range(len(Q)):
-        if Q[i].get_cpu_burst()[0] < mini:
-            mini = Q[i].get_cpu_burst()[0]
+        if Q[i].get_tau() < mini:
+            mini = Q[i].get_tau()
             process_index = i
     return process_index
 
 def find_new_tau(alpha, old_tau, burst_time):
-    return (alpha * burst_time) + ((1-alpha) * old_tau)
+    result = (alpha * burst_time) + ((1-alpha) * old_tau)
+    return math.ceil(result)
 
+def find_complete_IO(time, io_p):
+    index = -1
+    for i in range(len(io_p)):
+        if io_p[i].get_io_burst_stop_time() == time:
+            index = i
+    return index
+
+def io_process(io_p, cur_time, Q):
+    if len(io_p)!=0:
+        if find_complete_IO(cur_time, io_p)!= -1:
+            index = find_complete_IO(cur_time, io_p)
+            io_p[index].change_io_burst()
+            Q.append(io_p[index])
+            Q.sort(key=lambda x: x.get_pid())
+            Q.sort(key=lambda x: x.get_tau())
+            if(cur_time<10000):
+                print("time {}ms: Process {} (tau {}ms) completed I/O; added to ready queue {}".format(cur_time, io_p[index].get_pid(), io_p[index].get_tau(), print_ready_Q(Q)))
+            io_p.pop(index)
+    
 #Check if the input is valid
 try:
     n = int(sys.argv[1])
@@ -113,32 +133,79 @@ print("time 0ms: Simulator started for SJF [Q <empty>]")
 living_p = len(process_list)
 Q = []
 cur_time = 0
-
+switchs = 0
 while(living_p!= 0):
+    #CPU_PART
     if len(arr_list) != 0:
         if arr_list[0].get_arrival_time() == cur_time:
             Q.append(arr_list[0])
-            print("time {}ms: Process {} (tau {}ms) arrived; added to ready queue {}".format(cur_time,arr_list[0].get_pid(),arr_list[0].get_tau(),print_ready_Q(Q)))
+            Q.sort(key=lambda x: x.get_pid())
+            Q.sort(key=lambda x: x.get_tau())
+            if(cur_time<10000):
+                print("time {}ms: Process {} (tau {}ms) arrived; added to ready queue {}".format(cur_time,arr_list[0].get_pid(),arr_list[0].get_tau(),print_ready_Q(Q)))
             arr_list.pop(0)
             continue
+
     if cpu_p != None:
         if cur_time == cpu_p.get_cpu_burst_stop_time():
-            print("time {}ms: Process {} (tau {}ms) completed a CPU burst; {} bursts to go {}".format(cur_time, cpu_p.get_pid(), cpu_p.get_tau(), cpu_p.get_cpu_burst_times()-1, print_ready_Q(Q)))
-            
+            if(cur_time<10000):
+                print("time {}ms: Process {} (tau {}ms) completed a CPU burst; {} bursts to go {}".format(cur_time, cpu_p.get_pid(), cpu_p.get_tau(), cpu_p.get_cpu_burst_times()-1, print_ready_Q(Q)))
+            if cpu_p.get_cpu_burst_times()-1 == 0:
+                cpu_p.change_cpu_burst()
+                print("time {}ms: Process {} terminated {}".format(cur_time, cpu_p.get_pid(), print_ready_Q(Q)))
+                living_p -= 1
+                cpu_p = None
+                for i in range(half_t_cs+1):
+                    io_process(io_p,cur_time+i, Q)
+                cur_time += half_t_cs
+                switchs+=1
+                continue
+
             if(find_new_tau(alpha,cpu_p.get_tau(),cpu_p.get_cpu_burst_time(0))!= cpu_p.get_tau()):
-                print("time {}ms: Recalculating tau for process {}: old tau {}ms ==> new tau {:.0f}ms {}".format(cur_time, cpu_p.get_pid(), cpu_p.get_tau(), find_new_tau(alpha,cpu_p.get_tau(),cpu_p.get_cpu_burst_time(0)), print_ready_Q(Q)))
+                if(cur_time<10000):
+                    print("time {}ms: Recalculating tau for process {}: old tau {}ms ==> new tau {}ms {}".format(cur_time, cpu_p.get_pid(), cpu_p.get_tau(), find_new_tau(alpha,cpu_p.get_tau(),cpu_p.get_cpu_burst_time(0)), print_ready_Q(Q)))
                 cpu_p.set_tau(find_new_tau(alpha,cpu_p.get_tau(),cpu_p.get_cpu_burst_time(0)))
             cpu_p.change_cpu_burst()
+            cpu_p.set_io_burst_stop_time(cur_time+half_t_cs+cpu_p.get_io_burst_time(0))
             io_p.append(cpu_p)
-            print("time {}ms: Process {} switching out of CPU; blocking on I/O until time {}ms {}".format(cur_time, cpu_p.get_pid(), ))
-        
+            if(cur_time<10000):
+                print("time {}ms: Process {} switching out of CPU; blocking on I/O until time {}ms {}".format(cur_time, cpu_p.get_pid(), cpu_p.get_io_burst_stop_time(), print_ready_Q(Q)))
+            cpu_p = None
+            for i in range(half_t_cs+1):
+                io_process(io_p,cur_time+i, Q)
+            cur_time += half_t_cs
+            switchs+=1
+            continue
+
     elif(len(Q)!=0):
-        index  = find_shortest_burst(Q)
+        #index  = find_shortest_tau(Q)
+        cpu_p = Q[0]
+        Q.pop(0)
+        if(cur_time<10000):
+            print("time {}ms: Process {} (tau {}ms) started using the CPU for {}ms burst {}".format(cur_time + half_t_cs, cpu_p.get_pid(), cpu_p.get_tau(), cpu_p.get_cpu_burst_time(0), print_ready_Q(Q)))
+        cpu_p.set_cpu_burst_stop_time(cur_time + half_t_cs + cpu_p.get_cpu_burst_time(0))
+        for i in range(half_t_cs):
+            io_process(io_p,cur_time+1+i, Q)
         cur_time += half_t_cs
-        cpu_p = Q[index]
-        Q.pop(index)
-        print("time {}ms: Process {} (tau {}ms) started using the CPU for {}ms burst {}".format(cur_time, cpu_p.get_pid(), cpu_p.get_tau(), cpu_p.get_cpu_burst_time(0), print_ready_Q(Q)))
-        cpu_p.set_cpu_burst_stop_time(cur_time + cpu_p.get_cpu_burst_time(0))
+        switchs+=1
+    
+
+    #IO_PART
+    if len(io_p)!=0:
+        if find_complete_IO(cur_time, io_p)!= -1:
+            index = find_complete_IO(cur_time, io_p)
+            io_p[index].change_io_burst()
+            Q.append(io_p[index])
+            Q.sort(key=lambda x: x.get_pid())
+            Q.sort(key=lambda x: x.get_tau())
+            if(cur_time<10000):
+                print("time {}ms: Process {} (tau {}ms) completed I/O; added to ready queue {}".format(cur_time, io_p[index].get_pid(), io_p[index].get_tau(), print_ready_Q(Q)))
+            io_p.pop(index)
+            continue
     cur_time += 1
+
+
+print("time {}ms: Simulator ended for SJF [Q <empty>]".format(cur_time))
+print(switchs/2)
 
 
