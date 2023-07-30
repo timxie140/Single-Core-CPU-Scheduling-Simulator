@@ -46,7 +46,7 @@ class Process(object):
         self.wait_time_end = wait_time_end
 
     def cal_turnaround_time(self):
-        self.turnaround_time = self.turnaround_time_end - self.turnaround_time_start
+        self.turnaround_time += self.turnaround_time_end - self.turnaround_time_start
     
     def cal_wait_time(self):
         self.wait_time += self.wait_time_end - self.wait_time_start
