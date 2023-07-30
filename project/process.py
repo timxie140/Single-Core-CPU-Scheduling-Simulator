@@ -20,10 +20,10 @@ class Process(object):
         if len(self.cpu_burst_list) != 1:
                 s = "s"
         text = "{} process {}: arrival time {}ms; {} CPU burst{}:".format(self.ID, self.pid, self.arrival_time, len(self.cpu_burst_list), s) #for part 1 add \n behind :
-        for i in range(len(self.io_burst_list)):
-            text += "--> CPU burst {}ms ".format(self.cpu_burst_list[i])
-            text += "--> I/O burst {}ms\n".format(self.io_burst_list[i])      #this is for project part 1 output
-        text += "--> CPU burst {}ms".format(self.cpu_burst_list[-1])
+        # for i in range(len(self.io_burst_list)):
+        #     text += "--> CPU burst {}ms ".format(self.cpu_burst_list[i])
+        #     text += "--> I/O burst {}ms\n".format(self.io_burst_list[i])      #this is for project part 1 output
+        # text += "--> CPU burst {}ms".format(self.cpu_burst_list[-1])
         return text
     
     #Below is the burst setter for the class
@@ -46,7 +46,7 @@ class Process(object):
         self.wait_time_end = wait_time_end
 
     def cal_turnaround_time(self):
-        self.turnaround_time = self.turnaround_time_end - self.turnaround_time_start
+        self.turnaround_time += self.turnaround_time_end - self.turnaround_time_start
     
     def cal_wait_time(self):
         self.wait_time += self.wait_time_end - self.wait_time_start
@@ -108,4 +108,12 @@ class Process(object):
     
     def get_tau(self):
         return self.tau
-        
+          
+    def get_ID(self):
+        return self.ID    
+
+    def get_wait_time(self):
+        return self.wait_time
+    
+    def get_turnaround_time(self):
+        return self.turnaround_time
