@@ -57,10 +57,9 @@ class Process(object):
     def set_io_burst_stop_time(self, io_burst_stop_time):
         self.io_burst_stop_time = io_burst_stop_time
 
-    def set_tau(self, alpha, burst_time):
-        tmp = self.tau
-        self.tau = (alpha * burst_time) + ((1-alpha) * tmp)
-    
+    def set_tau(self, new_tau):
+        self.tau = new_tau
+        
     def change_io_burst(self):
         self.io_burst_list.pop(0)
         self.io_burst_times -= 1
