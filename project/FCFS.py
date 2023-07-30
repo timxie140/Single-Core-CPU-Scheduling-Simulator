@@ -201,7 +201,7 @@ def FCFS (process_list, t_cs):
         "-- average wait time: {:.3f} ms ({:.3f} ms/{:.3f} ms)\n"
         "-- average turnaround time: {:.3f} ms ({:.3f} ms/{:.3f} ms)\n"
         "-- number of context switches: {:.0f} ({:.0f}/{:.0f})\n"
-        "-- number of preemptions: {} ({}/{})\n"
+        "-- number of preemptions: {} ({}/{})\n\n"
     ).format(fcfs_cpu_utilization, 
             fcfs_average_cpu_burst_time, fcfs_cpubound_cpu_burst_time / cpubound_burst_times, fcfs_iobound_cpu_burst_time / iobound_burst_times,
             fcfs_average_wait_time, fcfs_cpu_wait_time / cpubound_burst_times, fcfs_io_wait_time / iobound_burst_times, 
