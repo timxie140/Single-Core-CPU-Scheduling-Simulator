@@ -14,6 +14,7 @@ class Process(object):
         self.wait_time_start = 0
         self.wait_time_end = 0
         self.tau = 1000
+        self.remaining_time = -1
     #Below is the concatenation of the string that will be printed out
     def __str__(self) -> str:
         s = ""
@@ -117,3 +118,20 @@ class Process(object):
     
     def get_turnaround_time(self):
         return self.turnaround_time
+    
+    #Below are getter/setter specific for RR algo
+    #setter
+    def set_slice_stop_time(self, slice_stop_time):
+        self.slice_stop_time = slice_stop_time
+
+    def set_remaining_time(self, remaining_time):
+        self.remaining_time = remaining_time
+    
+    #getter
+    def get_expire(self, time):
+        if time == self.slice_stop_time:
+            return True
+        return False
+
+    def get_remaining_time(self):
+        return self.remaining_time
