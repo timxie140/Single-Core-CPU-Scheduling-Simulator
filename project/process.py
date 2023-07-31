@@ -20,7 +20,7 @@ class Process(object):
         s = ""
         if len(self.cpu_burst_list) != 1:
                 s = "s"
-        text = "{} process {}: arrival time {}ms; {} CPU burst{}:".format(self.ID, self.pid, self.arrival_time, len(self.cpu_burst_list), s) #for part 1 add \n behind :
+        text = "{} process {}: arrival time {}ms; {} CPU burst{}".format(self.ID, self.pid, self.arrival_time, len(self.cpu_burst_list), s) #for part 1 add \n behind :
         # for i in range(len(self.io_burst_list)):
         #     text += "--> CPU burst {}ms ".format(self.cpu_burst_list[i])
         #     text += "--> I/O burst {}ms\n".format(self.io_burst_list[i])      #this is for project part 1 output
@@ -51,6 +51,9 @@ class Process(object):
     
     def cal_wait_time(self):
         self.wait_time += self.wait_time_end - self.wait_time_start
+
+    def adjust_wait_time(self):
+        self.wait_time -= 1
     
     def set_cpu_burst_stop_time(self, cpu_burst_stop_time):
         self.cpu_burst_stop_time = cpu_burst_stop_time
@@ -119,7 +122,7 @@ class Process(object):
     def get_turnaround_time(self):
         return self.turnaround_time
     
-    #Below are getter/setter specific for RR algo
+    #Below are getter/setter specific for RR/SRT algo
     #setter
     def set_slice_stop_time(self, slice_stop_time):
         self.slice_stop_time = slice_stop_time
