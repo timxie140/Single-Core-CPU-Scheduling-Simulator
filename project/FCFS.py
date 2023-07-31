@@ -66,21 +66,27 @@ def FCFS (process_list, t_cs):
     #Starting the FCFS
     print("time {}ms: Simulator started for FCFS {}".format(time, print_ready_Q(ready_Q)))
 
-    while alive_process != 0:
+    while alive_process != 0 or CTX != 0:
         if CTX_stop_time == time:
+            if CTX == 2:        #If the process is terminated
+                #Set the turnaround end time and calculate the turnaround time
+                Finished_list[-1].set_turnaround_end(time)
+                Finished_list[-1].cal_turnaround_time()
             CTX = 0
             if RUNNING == 0 and cpu_p != None:
-                CTX_stop_time = -2
+                CTX_stop_time = -2      #Means this is the process cpu burst start context switch
             else:
-                CTX_stop_time = -1
+                CTX_stop_time = -1      #Means this is the process cpu burst end context switch
+            if alive_process == 0:
+                break
         
         #Determine if the process arrival time is reached, then add it to the ready queue
         while len(FCFS_process_list) != 0 and FCFS_process_list[0].get_arrival_time() == time:
             p = FCFS_process_list.pop(0)
             ready_Q.append(p)
             #when it's added to the ready queue, set the turnaround start time and wait start time
-            p.set_turnaround_start(time)
             p.set_wait_start(time)
+            p.set_turnaround_start(time)
             #if time < 10000:
             print("time {}ms: Process {} arrived; added to ready queue {}".format(time, p.get_pid(), print_ready_Q(ready_Q)))
         
@@ -98,24 +104,18 @@ def FCFS (process_list, t_cs):
             #Determine if the process should be terminated, then add it to the finished list, by checking if there's cpu burst times left
             if cpu_p.get_cpu_burst_times() == 0:
                 Finished_list.append(cpu_p)
+                turn_end = time
                 print("time {}ms: Process {} terminated {}".format(time, cpu_p.get_pid(), print_ready_Q(ready_Q)))
-                if alive_process == 1:
-                    alive_process -= 1
-                    time += half_t_cs
-                else:
-                    alive_process -= 1
+
+                alive_process -= 1
                 #If a process is terminated, then the CPU is free, context switch occurs
                 context_switch += 0.5
                 if cpu_p.get_ID() == "CPU-bound":
                     cpu_context_switch += 0.5
                 else:
                     io_context_switch += 0.5
-                CTX = 1
+                CTX = 2
                 CTX_stop_time = time + half_t_cs
-
-                #Set the turnaround end time and calculate the turnaround time
-                cpu_p.set_turnaround_end(time)
-                cpu_p.cal_turnaround_time()
                 cpu_p = None
             #If there's still cpu burst times left, then there must at least have one more I/O burst, so add it to the I/O list
             else:
@@ -176,8 +176,7 @@ def FCFS (process_list, t_cs):
             #When a process is added to the ready queue, set the wait start time
             io_p.set_wait_start(time)
             
-        if alive_process != 0:    
-            time += 1
+        time += 1
     print("time {}ms: Simulator ended for FCFS {}\n".format(time, print_ready_Q(ready_Q)))
 
     #Calculate all data needed for the output file, will use the variable created before algo simulation
