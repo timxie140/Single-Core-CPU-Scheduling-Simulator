@@ -202,8 +202,15 @@ def FCFS (process_list, t_cs):
     fcfs_cpubound_average_cpu_burst_time = math.ceil((fcfs_cpubound_cpu_burst_time / cpubound_burst_times) * 1000) / 1000
     fcfs_iobound_average_cpu_burst_time = math.ceil((fcfs_iobound_cpu_burst_time / iobound_burst_times) * 1000) / 1000
 
+    print(fcfs_average_wait_time / fcfs_total_cpu_burst_times)
     fcfs_average_wait_time = math.ceil((fcfs_average_wait_time / fcfs_total_cpu_burst_times) * 1000) / 1000
-    fcfs_average_turnaround_time = ((fcfs_io_turnaround_time + fcfs_cpu_turnaround_time) - fcfs_total_io_elapsed_time) / fcfs_total_cpu_burst_times
+    fcfs_average_cpubound_wait_time = math.ceil((fcfs_cpu_wait_time / cpubound_burst_times) * 1000) / 1000
+    fcfs_average_iobound_wait_time = math.ceil((fcfs_io_wait_time / iobound_burst_times) * 1000) / 1000
+
+    fcfs_average_turnaround_time = math.ceil((((fcfs_io_turnaround_time + fcfs_cpu_turnaround_time) - fcfs_total_io_elapsed_time) / fcfs_total_cpu_burst_times) * 1000) / 1000
+    fcfs_average_cpubound_turnaround_time = math.ceil(((fcfs_cpu_turnaround_time - fcfs_cpubound_io_burst_time) / cpubound_burst_times) * 1000) / 1000
+    fcfs_average_iobound_turnaround_time = math.ceil(((fcfs_io_turnaround_time - fcfs_iobound_io_burst_time) / iobound_burst_times) * 1000) / 1000
+
     fcfs_context_switch = int(context_switch)
     fcfs_preemption = 0
 
@@ -218,9 +225,9 @@ def FCFS (process_list, t_cs):
         "-- number of preemptions: {} ({}/{})\n\n"
     ).format(fcfs_cpu_utilization, 
             fcfs_average_cpu_burst_time, fcfs_cpubound_average_cpu_burst_time, fcfs_iobound_average_cpu_burst_time,
-            fcfs_average_wait_time, fcfs_cpu_wait_time / cpubound_burst_times, fcfs_io_wait_time / iobound_burst_times, 
-            fcfs_average_turnaround_time, (fcfs_cpu_turnaround_time - fcfs_cpubound_io_burst_time) / cpubound_burst_times, (fcfs_io_turnaround_time - fcfs_iobound_io_burst_time) / iobound_burst_times, 
-            fcfs_context_switch, io_context_switch, cpu_context_switch, 
+            fcfs_average_wait_time, fcfs_average_cpubound_wait_time, fcfs_average_iobound_wait_time, 
+            fcfs_average_turnaround_time, fcfs_average_cpubound_turnaround_time, fcfs_average_iobound_turnaround_time, 
+            fcfs_context_switch, cpu_context_switch, io_context_switch,  
             fcfs_preemption, fcfs_preemption, fcfs_preemption)
     print(FCFS_text)
     #Return the output file, and output to file in project.py
