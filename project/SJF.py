@@ -177,7 +177,7 @@ while(living_p!= 0):
                     io_turn[cpu_p.get_pid()] = cpu_p.get_turnaround_time() - io_burst[cpu_p.get_pid()]
 
                 cpu_p = None
-                for i in range(half_t_cs+1):
+                for i in range(half_t_cs):
                     io_process(io_p,cur_time+i, Q)
                 cur_time += half_t_cs
                 switchs+=0.5
@@ -199,7 +199,7 @@ while(living_p!= 0):
                 io_switchs+=0.5
 
             cpu_p = None
-            for i in range(half_t_cs+1):
+            for i in range(half_t_cs):
                 io_process(io_p,cur_time+i, Q)
             cur_time += half_t_cs
             switchs+=0.5

@@ -43,8 +43,8 @@ def io_process(io_p, cur_time, Q):
             Q.append(io_p[index])
             Q.sort(key=lambda x: x.get_pid())
             Q.sort(key=lambda x: x.get_tau())
-            if(cur_time<10000):
-                print("time {}ms: Process {} (tau {}ms) completed I/O; added to ready queue {}".format(cur_time, io_p[index].get_pid(), io_p[index].get_tau(), print_ready_Q(Q)))
+            #if(cur_time<10000):
+            print("time {}ms: Process {} (tau {}ms) completed I/O; added to ready queue {}".format(cur_time, io_p[index].get_pid(), io_p[index].get_tau(), print_ready_Q(Q)))
             io_p.pop(index)
     
 #Check if the input is valid
@@ -129,7 +129,7 @@ for p in process_list:
 
 arr_list.sort(key=lambda x: x.get_arrival_time())
 
-print("time 0ms: Simulator started for SJF [Q <empty>]")
+print("time 0ms: Simulator started for SRT [Q <empty>]")
 
 living_p = len(process_list)
 Q = []
@@ -154,15 +154,16 @@ while(living_p!= 0):
             Q.append(arr_list[0])
             Q.sort(key=lambda x: x.get_pid())
             Q.sort(key=lambda x: x.get_tau())
-            if(cur_time<10000):
-                print("time {}ms: Process {} (tau {}ms) arrived; added to ready queue {}".format(cur_time,arr_list[0].get_pid(),arr_list[0].get_tau(),print_ready_Q(Q)))
+            #if(cur_time<10000):
+            print("time {}ms: Process {} (tau {}ms) arrived; added to ready queue {}".format(cur_time,arr_list[0].get_pid(),arr_list[0].get_tau(),print_ready_Q(Q)))
             arr_list.pop(0)
             continue
 
     if cpu_p != None:
         if cur_time == cpu_p.get_cpu_burst_stop_time():
-            if(cur_time<10000):
-                print("time {}ms: Process {} (tau {}ms) completed a CPU burst; {} bursts to go {}".format(cur_time, cpu_p.get_pid(), cpu_p.get_tau(), cpu_p.get_cpu_burst_times()-1, print_ready_Q(Q)))
+            #if(cur_time<10000):
+            print("time {}ms: Process {} (tau {}ms) completed a CPU burst; {} bursts to go {}".format(cur_time, cpu_p.get_pid(), cpu_p.get_tau(), cpu_p.get_cpu_burst_times()-1, print_ready_Q(Q)))
+            cpu_p.set_remaining_time(-1)
             if cpu_p.get_cpu_burst_times()-1 == 0:
                 cpu_p.change_cpu_burst()
                 print("time {}ms: Process {} terminated {}".format(cur_time, cpu_p.get_pid(), print_ready_Q(Q)))
@@ -177,21 +178,22 @@ while(living_p!= 0):
                     io_turn[cpu_p.get_pid()] = cpu_p.get_turnaround_time() - io_burst[cpu_p.get_pid()]
 
                 cpu_p = None
-                for i in range(half_t_cs+1):
+                #Doing IO when context switch
+                for i in range(half_t_cs):
                     io_process(io_p,cur_time+i, Q)
                 cur_time += half_t_cs
                 switchs+=0.5
                 continue
 
             if(find_new_tau(alpha,cpu_p.get_tau(),cpu_p.get_cpu_burst_time(0))!= cpu_p.get_tau()):
-                if(cur_time<10000):
-                    print("time {}ms: Recalculating tau for process {}: old tau {}ms ==> new tau {}ms {}".format(cur_time, cpu_p.get_pid(), cpu_p.get_tau(), find_new_tau(alpha,cpu_p.get_tau(),cpu_p.get_cpu_burst_time(0)), print_ready_Q(Q)))
+                #if(cur_time<10000):
+                print("time {}ms: Recalculating tau for process {}: old tau {}ms ==> new tau {}ms {}".format(cur_time, cpu_p.get_pid(), cpu_p.get_tau(), find_new_tau(alpha,cpu_p.get_tau(),cpu_p.get_cpu_burst_time(0)), print_ready_Q(Q)))
                 cpu_p.set_tau(find_new_tau(alpha,cpu_p.get_tau(),cpu_p.get_cpu_burst_time(0)))
             cpu_p.change_cpu_burst()
             cpu_p.set_io_burst_stop_time(cur_time+half_t_cs+cpu_p.get_io_burst_time(0))
             io_p.append(cpu_p)
-            if(cur_time<10000):
-                print("time {}ms: Process {} switching out of CPU; blocking on I/O until time {}ms {}".format(cur_time, cpu_p.get_pid(), cpu_p.get_io_burst_stop_time(), print_ready_Q(Q)))
+            #if(cur_time<10000):
+            print("time {}ms: Process {} switching out of CPU; blocking on I/O until time {}ms {}".format(cur_time, cpu_p.get_pid(), cpu_p.get_io_burst_stop_time(), print_ready_Q(Q)))
             
             if(cpu_p.get_ID() == "CPU-bound"):
                 cpu_switchs+=0.5
@@ -199,7 +201,8 @@ while(living_p!= 0):
                 io_switchs+=0.5
 
             cpu_p = None
-            for i in range(half_t_cs+1):
+            #Doing IO when context switch
+            for i in range(half_t_cs):
                 io_process(io_p,cur_time+i, Q)
             cur_time += half_t_cs
             switchs+=0.5
@@ -209,21 +212,26 @@ while(living_p!= 0):
         #index  = find_shortest_tau(Q)
         cpu_p = Q[0]
         Q.pop(0)
-        if(cur_time<10000):
+        #if(cur_time<10000):
+        if cpu_p.get_remaining_time() == -1:
             print("time {}ms: Process {} (tau {}ms) started using the CPU for {}ms burst {}".format(cur_time + half_t_cs, cpu_p.get_pid(), cpu_p.get_tau(), cpu_p.get_cpu_burst_time(0), print_ready_Q(Q)))
-
+            cpu_p.set_cpu_burst_stop_time(cur_time + half_t_cs + cpu_p.get_cpu_burst_time(0))
+        else:
+            print("time {}ms: Process {} (tau {}ms) started using the CPU for remaining {}ms of {}ms burst {}".format(cur_time + half_t_cs, cpu_p.get_pid(), cpu_p.get_tau(), cpu_p.get_remaining_time(), cpu_p.get_cpu_burst_time(0), print_ready_Q(Q)))
+            cpu_p.set_cpu_burst_stop_time(cur_time + half_t_cs + cpu_p.get_remaining_time())
         cpu_p.set_wait_end(cur_time)
-        cpu_p.set_cpu_burst_stop_time(cur_time + half_t_cs + cpu_p.get_cpu_burst_time(0))
+        #cpu_p.set_cpu_burst_stop_time(cur_time + half_t_cs + cpu_p.get_cpu_burst_time(0))
+        cpu_p.set_predict_cpu_burst_stop_time(cur_time + half_t_cs)
+        cpu_p.cal_wait_time()
 
         if(cpu_p.get_ID() == "CPU-bound"):
             cpu_switchs+=0.5
-            cpu_p.cal_wait_time()
             cpu_wait[cpu_p.get_pid()] = cpu_p.get_wait_time()
         else:
             io_switchs+=0.5
-            cpu_p.cal_wait_time()
             io_wait[cpu_p.get_pid()] = cpu_p.get_wait_time()
 
+        #Doing IO when context switch
         for i in range(half_t_cs):
             io_process(io_p,cur_time+1+i, Q)
         cur_time += half_t_cs
@@ -236,18 +244,68 @@ while(living_p!= 0):
             index = find_complete_IO(cur_time, io_p)
             io_p[index].change_io_burst()
             io_p[index].set_wait_start(cur_time)
-            Q.append(io_p[index])
-            Q.sort(key=lambda x: x.get_pid())
-            Q.sort(key=lambda x: x.get_tau())
-            if(cur_time<10000):
+
+            if cpu_p != None and io_p[index].get_tau() < cpu_p.get_remain_predict_time(cur_time):
+                tmp = deepcopy(Q)
+                tmp.append(io_p[index])
+                tmp.sort(key=lambda x: x.get_pid())
+                tmp.sort(key=lambda x: x.get_tau())
+                print("time {}ms: Process {} (tau {}ms) completed I/O; preempting {} {}".format(cur_time, io_p[index].get_pid(), io_p[index].get_tau(), cpu_p.get_pid(), print_ready_Q(tmp)))
+                
+                #old switch out
+                cpu_p.set_wait_start(cur_time+half_t_cs)
+                cpu_p.set_remaining_time(cpu_p.get_cpu_burst_stop_time()-cur_time)
+                Q.append(cpu_p)
+                Q.sort(key=lambda x: x.get_pid())
+                Q.sort(key=lambda x: x.get_tau())
+
+                if(cpu_p.get_ID() == "CPU-bound"):
+                    cpu_switchs+=0.5
+                else:
+                    io_switchs+=0.5
+                
+                cpu_p = io_p[index]
+                io_p.pop(index)
+
+                for i in range(half_t_cs):
+                    io_process(io_p,cur_time+i, Q)
+
+                #new switch in
+                cpu_p.set_wait_end(cur_time+half_t_cs)
+                cpu_p.set_cpu_burst_stop_time(cur_time + t_cs + cpu_p.get_cpu_burst_time(0))
+                cpu_p.set_predict_cpu_burst_stop_time(cur_time + t_cs)
+                cpu_p.cal_wait_time()
+
+                print("time {}ms: Process {} (tau {}ms) started using the CPU for {}ms burst {}".format(cur_time+t_cs, cpu_p.get_pid(), cpu_p.get_tau(), cpu_p.get_cpu_burst_time(0), print_ready_Q(Q)))
+                if(cpu_p.get_ID() == "CPU-bound"):
+                    cpu_switchs+=0.5
+                    cpu_wait[cpu_p.get_pid()] = cpu_p.get_wait_time()
+                else:
+                    io_switchs+=0.5
+                    io_wait[cpu_p.get_pid()] = cpu_p.get_wait_time()
+
+                for i in range(half_t_cs):
+                    io_process(io_p,cur_time+half_t_cs+i, Q)
+                    
+                switchs+=1
+                cur_time += t_cs
+                
+
+            else:
+                Q.append(io_p[index])
+                Q.sort(key=lambda x: x.get_pid())
+                Q.sort(key=lambda x: x.get_tau())
+                #if(cur_time<10000):
                 print("time {}ms: Process {} (tau {}ms) completed I/O; added to ready queue {}".format(cur_time, io_p[index].get_pid(), io_p[index].get_tau(), print_ready_Q(Q)))
-            
-            io_p.pop(index)
+                
+                io_p.pop(index)
+
             continue
+
     cur_time += 1
 
 
-print("time {}ms: Simulator ended for SJF [Q <empty>]".format(cur_time))
+print("time {}ms: Simulator ended for SRT [Q <empty>]".format(cur_time))
 print(switchs)
 print(cpu_switchs)
 print(io_switchs)
