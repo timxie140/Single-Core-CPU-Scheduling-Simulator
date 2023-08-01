@@ -79,13 +79,12 @@ def FCFS (process_list, t_cs):
                 CTX_stop_time = -1      #Means this is the process cpu burst end context switch
             if alive_process == 0:
                 break
-        
+                
         #Determine if the process arrival time is reached, then add it to the ready queue
         while len(FCFS_process_list) != 0 and FCFS_process_list[0].get_arrival_time() == time:
             p = FCFS_process_list.pop(0)
             ready_Q.append(p)
-            #when it's added to the ready queue, set the turnaround start time and wait start time
-            p.set_wait_start(time)
+            #when it's added to the ready queue, set the turnaround start time
             p.set_turnaround_start(time)
             #if time < 10000:
             print("time {}ms: Process {} arrived; added to ready queue {}".format(time, p.get_pid(), print_ready_Q(ready_Q)))
@@ -104,16 +103,18 @@ def FCFS (process_list, t_cs):
             #Determine if the process should be terminated, then add it to the finished list, by checking if there's cpu burst times left
             if cpu_p.get_cpu_burst_times() == 0:
                 Finished_list.append(cpu_p)
-                turn_end = time
                 print("time {}ms: Process {} terminated {}".format(time, cpu_p.get_pid(), print_ready_Q(ready_Q)))
 
                 alive_process -= 1
                 #If a process is terminated, then the CPU is free, context switch occurs
                 context_switch += 0.5
+                
                 if cpu_p.get_ID() == "CPU-bound":
                     cpu_context_switch += 0.5
+                    
                 else:
                     io_context_switch += 0.5
+                    
                 CTX = 2
                 CTX_stop_time = time + half_t_cs
                 cpu_p = None
@@ -138,32 +139,35 @@ def FCFS (process_list, t_cs):
                 if ready_Q and ready_Q[0].get_pid() != io_p.get_pid():
                     CTX = 1
                     CTX_stop_time = time + half_t_cs
+                    
+                        
 
         if RUNNING == 0 and (len(ready_Q) != 0 or cpu_p != None) and CTX == 0:
             if CTX_stop_time == -2:
-                CTX_stop_time = -1
-                RUNNING = 1 
+                CTX_stop_time = -3
+                #when the process is taking out of the ready queue, set the wait end time and calculate the wait time
+                RUNNING = 1
                 #cal cpu burst stop time for comparison later
                 cpu_p.set_cpu_burst_stop_time(cpu_p.get_cpu_burst_time(0) + time)
                 #if time < 10000:
                 print("time {}ms: Process {} started using the CPU for {}ms burst {}".format(time, cpu_p.get_pid(), cpu_p.get_cpu_burst_time(0), print_ready_Q(ready_Q)))
             else:
                 cpu_p = ready_Q.pop(0)
-                #when the process is taking out of the ready queue, set the wait end time and calculate the wait time
-                cpu_p.set_wait_end(time)
-                cpu_p.cal_wait_time()
                 CTX = 1
-
+                
                 if io_p != None and io_p.get_pid() == cpu_p.get_pid() and time - io_p.get_io_burst_stop_time() <= half_t_cs:
                     CTX_stop_time = time + half_t_cs - 1
                 else:
                     CTX_stop_time = time + half_t_cs
                 #when process is switching into CPU context switch happens, the second half of the context switch is done
                 context_switch += 0.5
+                
                 if cpu_p.get_ID() == "CPU-bound":
                     cpu_context_switch += 0.5
+                    
                 else:
                     io_context_switch += 0.5
+                    
         
          #Determine if a io burst is finished, since the io list is sorted, 
         #the first process in the io list is the one that will finish the io burst first
@@ -171,10 +175,9 @@ def FCFS (process_list, t_cs):
             io_p = io_list.pop(0)
             ready_Q.append(io_p)    
             io_p.change_io_burst()
+            
             #if time < 10000:
             print("time {}ms: Process {} completed I/O; added to ready queue {}".format(time, io_p.get_pid(), print_ready_Q(ready_Q)))
-            #When a process is added to the ready queue, set the wait start time
-            io_p.set_wait_start(time)
             
         time += 1
     print("time {}ms: Simulator ended for FCFS {}\n".format(time, print_ready_Q(ready_Q)))
@@ -205,13 +208,17 @@ def FCFS (process_list, t_cs):
     fcfs_cpubound_average_cpu_burst_time = math.ceil((fcfs_cpubound_cpu_burst_time / cpubound_burst_times) * 1000) / 1000
     fcfs_iobound_average_cpu_burst_time = math.ceil((fcfs_iobound_cpu_burst_time / iobound_burst_times) * 1000) / 1000
 
-    fcfs_average_wait_time = math.ceil((fcfs_average_wait_time / fcfs_total_cpu_burst_times) * 1000) / 1000
-    fcfs_average_cpubound_wait_time = math.ceil((fcfs_cpu_wait_time / cpubound_burst_times) * 1000) / 1000
-    fcfs_average_iobound_wait_time = math.ceil((fcfs_io_wait_time / iobound_burst_times) * 1000) / 1000
+    fcfs_total_turnaround_time = fcfs_io_turnaround_time + fcfs_cpu_turnaround_time
+    fcfs_iobound_turnaround_time = fcfs_io_turnaround_time - fcfs_iobound_io_burst_time
+    fcfs_cpubound_turnaround_time = fcfs_cpu_turnaround_time - fcfs_cpubound_io_burst_time
 
-    fcfs_average_turnaround_time = math.ceil((((fcfs_io_turnaround_time + fcfs_cpu_turnaround_time) - fcfs_total_io_elapsed_time) / fcfs_total_cpu_burst_times) * 1000) / 1000
-    fcfs_average_cpubound_turnaround_time = math.ceil(((fcfs_cpu_turnaround_time - fcfs_cpubound_io_burst_time) / cpubound_burst_times) * 1000) / 1000
-    fcfs_average_iobound_turnaround_time = math.ceil(((fcfs_io_turnaround_time - fcfs_iobound_io_burst_time) / iobound_burst_times) * 1000) / 1000
+    fcfs_average_turnaround_time = math.ceil(((fcfs_total_turnaround_time - fcfs_total_io_elapsed_time) / fcfs_total_cpu_burst_times) * 1000) / 1000
+    fcfs_average_cpubound_turnaround_time = math.ceil((fcfs_cpubound_turnaround_time / cpubound_burst_times) * 1000) / 1000
+    fcfs_average_iobound_turnaround_time = math.ceil((fcfs_iobound_turnaround_time / iobound_burst_times) * 1000) / 1000
+
+    fcfs_average_wait_time = math.ceil((((fcfs_total_turnaround_time - fcfs_total_io_elapsed_time) / fcfs_total_cpu_burst_times) - (fcfs_total_cpu_elapsed_time / fcfs_total_cpu_burst_times) - t_cs) * 1000) / 1000
+    fcfs_average_cpubound_wait_time = math.ceil(((fcfs_cpubound_turnaround_time / cpubound_burst_times) - (fcfs_cpubound_cpu_burst_time / cpubound_burst_times) - t_cs) * 1000) / 1000
+    fcfs_average_iobound_wait_time = math.ceil(((fcfs_iobound_turnaround_time / iobound_burst_times) - (fcfs_iobound_cpu_burst_time / iobound_burst_times) - t_cs) * 1000) / 1000
 
     fcfs_context_switch = int(context_switch)
     fcfs_preemption = 0
