@@ -15,6 +15,7 @@ class Process(object):
         self.wait_time_end = 0
         self.tau = 1000
         self.remaining_time = -1
+        self.predict_cpu_burst_stop_time = 0
     #Below is the concatenation of the string that will be printed out
     def __str__(self) -> str:
         s = ""
@@ -57,6 +58,9 @@ class Process(object):
     
     def set_io_burst_stop_time(self, io_burst_stop_time):
         self.io_burst_stop_time = io_burst_stop_time
+
+    def set_predict_cpu_burst_stop_time(self, time):
+        self.predict_cpu_burst_stop_time = time + self.tau
 
     def set_tau(self, new_tau):
         self.tau = new_tau
@@ -118,6 +122,9 @@ class Process(object):
     
     def get_turnaround_time(self):
         return self.turnaround_time
+    
+    def get_remain_predict_time(self, time):
+        return self.predict_cpu_burst_stop_time - time
     
     #Below are getter/setter specific for RR algo
     #setter
