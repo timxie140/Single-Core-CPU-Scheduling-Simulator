@@ -129,7 +129,6 @@ class Process(object):
     def get_remain_predict_time(self, time):
         return self.predict_cpu_burst_stop_time - time
     
-    #Below are getter/setter specific for RR algo
     #Below are getter/setter specific for RR/SRT algo
     #setter
     def set_slice_stop_time(self, slice_stop_time):
