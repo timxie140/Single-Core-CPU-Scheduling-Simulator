@@ -298,7 +298,7 @@ def RR (process_list, t_cs, t_slice):
         "-- average wait time: {:.3f} ms ({:.3f} ms/{:.3f} ms)\n"
         "-- average turnaround time: {:.3f} ms ({:.3f} ms/{:.3f} ms)\n"
         "-- number of context switches: {:.0f} ({:.0f}/{:.0f})\n"
-        "-- number of preemptions: {} ({}/{})\n\n"
+        "-- number of preemptions: {} ({}/{})\n"
     ).format(rr_cpu_utilization, 
             rr_average_cpu_burst_time, rr_cpubound_average_cpu_burst_time, rr_iobound_average_cpu_burst_time,
             rr_average_wait_time, rr_average_cpubound_wait_time, rr_average_iobound_wait_time, 
