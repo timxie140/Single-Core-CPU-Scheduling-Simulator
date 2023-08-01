@@ -85,7 +85,7 @@ for i in range(n-ncpu):
 
     cpu_burst_time = []
     io_burst_time = []
-    p = Process(arrival_time, "I/O-bound", pid)
+    p = Process(arrival_time, "I/O-bound", pid, _lambda)
     #put the CPU burst time and I/O burst time into the list
     for j in range(cpu_burst_times):
         cpu_burst_time.append(random.ceil())
@@ -102,7 +102,7 @@ for i in range(n - ncpu, n):
 
     cpu_burst_time = []
     io_burst_time = []
-    p = Process(arrival_time, "CPU-bound", pid)
+    p = Process(arrival_time, "CPU-bound", pid, _lambda)
     #put the CPU burst time and I/O burst time into the list
     for j in range(cpu_burst_times):
         cpu_burst_time.append(random.ceil() * 4)
