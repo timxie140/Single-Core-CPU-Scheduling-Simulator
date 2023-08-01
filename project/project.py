@@ -3,6 +3,7 @@ import math
 from drand48 import Rand48
 from process import Process
 from FCFS import FCFS
+from RR import RR
 
 #Check if the input is valid
 try:
@@ -72,7 +73,7 @@ for p in process_list:
     print(p)
 print()   #for part 1 comment out this line
     
-print("<<< PROJECT PART II -- t_cs={}ms; alpha={}; t_slice={}ms >>>".format(t_cs, alpha, t_slice))
+print("<<< PROJECT PART II -- t_cs={}ms; alpha={:.2f}; t_slice={}ms >>>".format(t_cs, alpha, t_slice))
 
 #First-come-first-served (FCFS)
 FCFS_output = FCFS(process_list, t_cs)
@@ -86,10 +87,10 @@ FCFS_output = FCFS(process_list, t_cs)
 
 
 #Round robin (RR)
+RR_output = RR(process_list, t_cs, t_slice)
 
+Final_output = FCFS_output + RR_output
 
-Final_output = ""
-Final_output += FCFS_output
 with open('project/simout.txt', 'w') as file:
-    # Write some text to the file
+    # Write Final output to the file
     file.write(Final_output)
