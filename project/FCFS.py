@@ -66,6 +66,7 @@ def FCFS (process_list, t_cs):
     #Starting the FCFS
     print("time {}ms: Simulator started for FCFS {}".format(time, print_ready_Q(ready_Q)))
 
+    #FCFS algo runs here
     while alive_process != 0 or CTX != 0:
         if CTX_stop_time == time:
             if CTX == 2:        #If the process is terminated
@@ -108,13 +109,10 @@ def FCFS (process_list, t_cs):
                 alive_process -= 1
                 #If a process is terminated, then the CPU is free, context switch occurs
                 context_switch += 0.5
-                
                 if cpu_p.get_ID() == "CPU-bound":
                     cpu_context_switch += 0.5
-                    
                 else:
                     io_context_switch += 0.5
-                    
                 CTX = 2
                 CTX_stop_time = time + half_t_cs
                 cpu_p = None
@@ -126,6 +124,7 @@ def FCFS (process_list, t_cs):
                 cpu_p = None
                 io_list.append(io_p)
                 #sort by io burst stop time to make sure the first process in the io list is the one that will finish the io burst first
+                io_list.sort(key=lambda x: x.get_pid())
                 io_list.sort(key=lambda x: x.get_io_burst_stop_time())
                 if time < 10000:
                     print("time {}ms: Process {} switching out of CPU; blocking on I/O until time {}ms {}".format(time, io_p.get_pid(), io_p.get_io_burst_stop_time(), print_ready_Q(ready_Q)))
@@ -143,7 +142,7 @@ def FCFS (process_list, t_cs):
         #Determine if the CPU is free, and there's process in the ready queue, then start the process
         if RUNNING == 0 and (len(ready_Q) != 0 or cpu_p != None) and CTX == 0:
             if CTX_stop_time == -2:
-                CTX_stop_time = -3
+                CTX_stop_time = -4
                 #when the process is taking out of the ready queue, set the wait end time and calculate the wait time
                 RUNNING = 1
                 #cal cpu burst stop time for comparison later
@@ -153,14 +152,13 @@ def FCFS (process_list, t_cs):
             else:
                 cpu_p = ready_Q.pop(0)
                 CTX = 1
-                
                 if io_p != None and io_p.get_pid() == cpu_p.get_pid() and time - io_p.get_io_burst_stop_time() <= half_t_cs:
                     CTX_stop_time = time + half_t_cs - 1
                 else:
                     CTX_stop_time = time + half_t_cs
+
                 #when process is switching into CPU context switch happens, the second half of the context switch is done
                 context_switch += 0.5
-                
                 if cpu_p.get_ID() == "CPU-bound":
                     cpu_context_switch += 0.5
                     
