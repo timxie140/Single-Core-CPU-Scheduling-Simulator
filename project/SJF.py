@@ -161,9 +161,10 @@ while(living_p!= 0):
 
     if cpu_p != None:
         if cur_time == cpu_p.get_cpu_burst_stop_time():
-            if(cur_time<10000):
-                print("time {}ms: Process {} (tau {}ms) completed a CPU burst; {} bursts to go {}".format(cur_time, cpu_p.get_pid(), cpu_p.get_tau(), cpu_p.get_cpu_burst_times()-1, print_ready_Q(Q)))
-            if cpu_p.get_cpu_burst_times()-1 == 0:
+            if cpu_p.get_cpu_burst_times()-1 != 0:
+                if(cur_time<10000):
+                    print("time {}ms: Process {} (tau {}ms) completed a CPU burst; {} bursts to go {}".format(cur_time, cpu_p.get_pid(), cpu_p.get_tau(), cpu_p.get_cpu_burst_times()-1, print_ready_Q(Q)))
+            elif cpu_p.get_cpu_burst_times()-1 == 0:
                 cpu_p.change_cpu_burst()
                 print("time {}ms: Process {} terminated {}".format(cur_time, cpu_p.get_pid(), print_ready_Q(Q)))
                 living_p -= 1

@@ -161,10 +161,15 @@ while(living_p!= 0):
 
     if cpu_p != None:
         if cur_time == cpu_p.get_cpu_burst_stop_time():
+            if cpu_p.get_cpu_burst_times()-1 != 0:
             #if(cur_time<10000):
-            print("time {}ms: Process {} (tau {}ms) completed a CPU burst; {} bursts to go {}".format(cur_time, cpu_p.get_pid(), cpu_p.get_tau(), cpu_p.get_cpu_burst_times()-1, print_ready_Q(Q)))
-            cpu_p.set_remaining_time(-1)
-            if cpu_p.get_cpu_burst_times()-1 == 0:
+                if (cpu_p.get_cpu_burst_times()-1)>1 :
+                    print("time {}ms: Process {} (tau {}ms) completed a CPU burst; {} bursts to go {}".format(cur_time, cpu_p.get_pid(), cpu_p.get_tau(), cpu_p.get_cpu_burst_times()-1, print_ready_Q(Q)))
+                else:
+                    print("time {}ms: Process {} (tau {}ms) completed a CPU burst; {} burst to go {}".format(cur_time, cpu_p.get_pid(), cpu_p.get_tau(), cpu_p.get_cpu_burst_times()-1, print_ready_Q(Q)))
+                cpu_p.set_remaining_time(-1)
+            elif cpu_p.get_cpu_burst_times()-1 == 0:
+                cpu_p.set_remaining_time(-1)
                 cpu_p.change_cpu_burst()
                 print("time {}ms: Process {} terminated {}".format(cur_time, cpu_p.get_pid(), print_ready_Q(Q)))
                 living_p -= 1
@@ -216,12 +221,14 @@ while(living_p!= 0):
         if cpu_p.get_remaining_time() == -1:
             print("time {}ms: Process {} (tau {}ms) started using the CPU for {}ms burst {}".format(cur_time + half_t_cs, cpu_p.get_pid(), cpu_p.get_tau(), cpu_p.get_cpu_burst_time(0), print_ready_Q(Q)))
             cpu_p.set_cpu_burst_stop_time(cur_time + half_t_cs + cpu_p.get_cpu_burst_time(0))
+            cpu_p.set_predict_cpu_burst_stop_time(cur_time + half_t_cs)
         else:
             print("time {}ms: Process {} (tau {}ms) started using the CPU for remaining {}ms of {}ms burst {}".format(cur_time + half_t_cs, cpu_p.get_pid(), cpu_p.get_tau(), cpu_p.get_remaining_time(), cpu_p.get_cpu_burst_time(0), print_ready_Q(Q)))
             cpu_p.set_cpu_burst_stop_time(cur_time + half_t_cs + cpu_p.get_remaining_time())
+            cpu_p.set_fake_predict_cpu_burst_stop_time(cur_time + half_t_cs)
         cpu_p.set_wait_end(cur_time)
         #cpu_p.set_cpu_burst_stop_time(cur_time + half_t_cs + cpu_p.get_cpu_burst_time(0))
-        cpu_p.set_predict_cpu_burst_stop_time(cur_time + half_t_cs)
+        
         cpu_p.cal_wait_time()
 
         if(cpu_p.get_ID() == "CPU-bound"):
