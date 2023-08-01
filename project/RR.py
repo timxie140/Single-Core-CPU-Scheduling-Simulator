@@ -83,14 +83,17 @@ def RR (process_list, t_cs, t_slice):
             CTX = 0
             if RUNNING == 0 and cpu_p != None:
                 CTX_stop_time = -2      #Means this is the process cpu burst start context switch
+
             elif preem_ready_q_p != None:
                 CTX_stop_time = -3      #Means this is the process preemption context switch
                 ready_Q.append(preem_ready_q_p)
                 preem_ready_q_p = None
+
             else:
                 CTX_stop_time = -1      #Means this is the process cpu burst end context switch
+
             if alive_process == 0:
-                break
+                break                   #Means the whole RR algo is done(It's the last context switch after the last process is terminated)
 
         #Determine if the process arrival time is reached, then add it to the ready queue
         while len(RR_process_list) != 0 and RR_process_list[0].get_arrival_time() == time:
@@ -107,6 +110,8 @@ def RR (process_list, t_cs, t_slice):
             if ready_Q:
                 remaining_time = cpu_p.get_cpu_burst_stop_time() - time
                 preemption += 1
+
+                #When preemption happens, add preemption times to io-bound or cpu-bound process
                 if cpu_p.get_ID() == "CPU-bound":
                     cpu_preemption += 1
                 else:
@@ -116,11 +121,13 @@ def RR (process_list, t_cs, t_slice):
                 if time < 10000:
                     print("time {}ms: Time slice expired; preempting process {} with {}ms remaining {}".format(time, cpu_p.get_pid(), remaining_time, print_ready_Q(ready_Q)))
                 RUNNING = 0
+                #cpu stop running and perform context switch
                 context_switch += 0.5
                 if cpu_p.get_ID() == "CPU-bound":
                     cpu_context_switch += 0.5
                 else:
                     io_context_switch += 0.5
+                #set context switch status and stop time
                 CTX = 1
                 CTX_stop_time = time + half_t_cs
                 preem_ready_q_p = cpu_p
@@ -180,6 +187,9 @@ def RR (process_list, t_cs, t_slice):
                     CTX = 1
                     CTX_stop_time = time + half_t_cs 
         
+        #If the cpu is not running, and either there's process waiting in the ready_Q, 
+        # or the process start context switch is performing
+        #therefore check for both ready_Q length and cpu_p is None
         if RUNNING == 0 and (len(ready_Q) != 0 or cpu_p != None) and CTX == 0:
             if CTX_stop_time == -2:
                 CTX_stop_time = -4
@@ -249,27 +259,32 @@ def RR (process_list, t_cs, t_slice):
         rr_total_cpu_burst_times += p.get_cpu_burst_times()
 
     #Final calculate the data after retriving all the data needed
+    #Below is the burst time calculation, uses math.ceil to round up to 3 decimal places
     rr_average_cpu_burst_time = math.ceil((rr_total_cpu_elapsed_time / rr_total_cpu_burst_times) * 1000 ) / 1000
     rr_cpubound_average_cpu_burst_time = math.ceil((rr_cpubound_cpu_burst_time / cpubound_burst_times) * 1000) / 1000
     rr_iobound_average_cpu_burst_time = math.ceil((rr_iobound_cpu_burst_time / iobound_burst_times) * 1000) / 1000
 
+    #Below is the turnaround time calculation, first cluster is just turnaround time
     rr_total_turnaround_time = rr_io_turnaround_time + rr_cpu_turnaround_time
     rr_iobound_turnaround_time = rr_io_turnaround_time - rr_iobound_io_burst_time
     rr_cpubound_turnaround_time = rr_cpu_turnaround_time - rr_cpubound_io_burst_time
-
+    #Continue for turnaround time calculation, second cluster is average turnaround time
     rr_average_turnaround_time = math.ceil(((rr_total_turnaround_time - rr_total_io_elapsed_time) / rr_total_cpu_burst_times) * 1000) / 1000
     rr_average_cpubound_turnaround_time = math.ceil((rr_cpubound_turnaround_time / cpubound_burst_times) * 1000) / 1000
     rr_average_iobound_turnaround_time = math.ceil((rr_iobound_turnaround_time / iobound_burst_times) * 1000) / 1000
 
+    #prepare the context switch time for calculation, since one cpu burst may have multiple context switch
     rr_total_average_context_switch = ((context_switch * t_cs) / rr_total_cpu_burst_times)
     rr_iobound_average_context_switch = ((io_context_switch * t_cs) / iobound_burst_times)
     rr_cpubound_average_context_switch = ((cpu_context_switch * t_cs) / cpubound_burst_times)
 
+    #Below is the wait time calculation, first cluster is just wait time
     rr_average_wait_time = math.ceil((((rr_total_turnaround_time - rr_total_io_elapsed_time) / rr_total_cpu_burst_times) - (rr_total_cpu_elapsed_time / rr_total_cpu_burst_times) - rr_total_average_context_switch) * 1000) / 1000
     rr_average_cpubound_wait_time = math.ceil(((rr_cpubound_turnaround_time / cpubound_burst_times) - (rr_cpubound_cpu_burst_time / cpubound_burst_times) - rr_cpubound_average_context_switch) * 1000) / 1000
     rr_average_iobound_wait_time = math.ceil(((rr_iobound_turnaround_time / iobound_burst_times) - (rr_iobound_cpu_burst_time / iobound_burst_times) - rr_iobound_average_context_switch) * 1000) / 1000
 
     rr_context_switch = int(context_switch)
+    #Below is the preemption, take data from the recording during the simulation
     rr_preemption = preemption
     rr_io_preemption = io_preemption
     rr_cpu_preemption = cpu_preemption
