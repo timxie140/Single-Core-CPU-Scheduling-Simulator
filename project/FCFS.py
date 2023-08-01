@@ -138,10 +138,9 @@ def FCFS (process_list, t_cs):
                     io_context_switch += 0.5
                 if ready_Q and ready_Q[0].get_pid() != io_p.get_pid():
                     CTX = 1
-                    CTX_stop_time = time + half_t_cs
-                    
-                        
+                    CTX_stop_time = time + half_t_cs               
 
+        #Determine if the CPU is free, and there's process in the ready queue, then start the process
         if RUNNING == 0 and (len(ready_Q) != 0 or cpu_p != None) and CTX == 0:
             if CTX_stop_time == -2:
                 CTX_stop_time = -3
@@ -238,6 +237,6 @@ def FCFS (process_list, t_cs):
             fcfs_average_turnaround_time, fcfs_average_cpubound_turnaround_time, fcfs_average_iobound_turnaround_time, 
             fcfs_context_switch, cpu_context_switch, io_context_switch,  
             fcfs_preemption, fcfs_preemption, fcfs_preemption)
-    print(FCFS_text)
+    
     #Return the output file, and output to file in project.py
     return FCFS_text
