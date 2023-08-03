@@ -250,13 +250,12 @@ def RR (process_list, t_cs, t_slice):
         rr_total_cpu_burst_times += p.get_cpu_burst_times()
     
     #Below is the turnaround time data preparation
-    rr_total_turnaround_time = rr_io_turnaround_time + rr_cpu_turnaround_time
+    rr_total_turnaround_time = rr_io_turnaround_time + rr_cpu_turnaround_time - rr_total_io_elapsed_time
     rr_iobound_turnaround_time = rr_io_turnaround_time - rr_iobound_io_burst_time
     rr_cpubound_turnaround_time = rr_cpu_turnaround_time - rr_cpubound_io_burst_time
 
     RR_Dictionary = {"time": time,
                      "total_cpu_elapsed_time": rr_total_cpu_elapsed_time, 
-                     "total_io_elapsed_time": rr_total_io_elapsed_time,
                      "total_cpu_burst_times": rr_total_cpu_burst_times, 
                      "cpubound_cpu_burst_time": rr_cpubound_cpu_burst_time,
                      "iobound_cpu_burst_time": rr_iobound_cpu_burst_time,

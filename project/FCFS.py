@@ -191,13 +191,12 @@ def FCFS (process_list, t_cs):
             fcfs_cpu_turnaround_time += p.get_turnaround_time()
         fcfs_total_cpu_burst_times += p.get_cpu_burst_times()
 
-    fcfs_total_turnaround_time = fcfs_io_turnaround_time + fcfs_cpu_turnaround_time
+    fcfs_total_turnaround_time = fcfs_io_turnaround_time + fcfs_cpu_turnaround_time - fcfs_total_io_elapsed_time
     fcfs_iobound_turnaround_time = fcfs_io_turnaround_time - fcfs_iobound_io_burst_time
     fcfs_cpubound_turnaround_time = fcfs_cpu_turnaround_time - fcfs_cpubound_io_burst_time
 
     FCFS_Dictionary = {"time": time,
                      "total_cpu_elapsed_time": fcfs_total_cpu_elapsed_time, 
-                     "total_io_elapsed_time": fcfs_total_io_elapsed_time,
                      "total_cpu_burst_times": fcfs_total_cpu_burst_times, 
                      "cpubound_cpu_burst_time": fcfs_cpubound_cpu_burst_time,
                      "iobound_cpu_burst_time": fcfs_iobound_cpu_burst_time,

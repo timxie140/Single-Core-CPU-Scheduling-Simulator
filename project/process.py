@@ -10,9 +10,6 @@ class Process(object):
         self.turnaround_time = 0
         self.turnaround_time_start = 0
         self.turnaround_time_end = 0
-        self.wait_time = 0
-        self.wait_time_start = 0
-        self.wait_time_end = 0
         self.tau = int(1 / _lambda)
         self.remaining_time = -1
         self.predict_cpu_burst_stop_time = 0
@@ -69,7 +66,6 @@ class Process(object):
         self.cpu_burst_list.pop(0)
         self.cpu_burst_times -= 1
     
-
     #Below are the getters for the class
     def get_cpu_burst(self):
         return self.cpu_burst_list
@@ -112,9 +108,6 @@ class Process(object):
           
     def get_ID(self):
         return self.ID    
-
-    def get_wait_time(self):
-        return self.wait_time
     
     def get_turnaround_time(self):
         return self.turnaround_time

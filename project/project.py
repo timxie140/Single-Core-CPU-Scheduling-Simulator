@@ -4,9 +4,16 @@ from drand48 import Rand48
 from process import Process
 from copy import deepcopy
 from FCFS import FCFS
-# from SJF import SJF
-# from SRT import SRT
+from SJF import SJF
+from SRT import SRT
 from RR import RR
+
+result_template = {"cpu_utilization" : 0,
+          "avg_cpu_burst_time" : 0, "cpubound_avg_cpu_burst_time" : 0, "iobound_avg_cpu_burst_time" : 0,
+          "avg_wait_time" : 0, "cpubound_avg_wait_time" : 0, "iobound_avg_wait_time" : 0,
+          "avg_turnaround_time" : 0, "cpubound_avg_turnaround_time" : 0, "iobound_avg_turnaround_time" : 0,
+          "context_switch" : 0, "cpu_context_switch" : 0, "io_context_switch" : 0,
+          "preemption" : 0, "cpu_preemption" : 0, "io_preemption" : 0}
 
 #calculate non-preemptive algo's result
 def non_preemptive_result(data, result, t_cs):
@@ -16,15 +23,14 @@ def non_preemptive_result(data, result, t_cs):
     result["cpubound_avg_cpu_burst_time"] = math.ceil((data["cpubound_cpu_burst_time"] / data["cpubound_burst_times"]) * 1000) / 1000
     result["iobound_avg_cpu_burst_time"] = math.ceil((data["iobound_cpu_burst_time"] / data["iobound_burst_times"]) * 1000) / 1000
 
-    result["avg_wait_time"] = math.ceil(((data["total_turnaround_time"] - data["total_io_elapsed_time"]) 
-                                         / data["total_cpu_burst_times"]- (data["total_cpu_elapsed_time"] / data["total_cpu_burst_times"]) - t_cs) * 1000) / 1000
+    result["avg_wait_time"] = math.ceil((data["total_turnaround_time"] / data["total_cpu_burst_times"]- (data["total_cpu_elapsed_time"] 
+                                                                                                         / data["total_cpu_burst_times"]) - t_cs) * 1000) / 1000
     result["cpubound_avg_wait_time"] = math.ceil(((data["cpubound_turnaround_time"] / data["cpubound_burst_times"]) - 
                                                   (data["cpubound_cpu_burst_time"] / data["cpubound_burst_times"]) - t_cs) * 1000) / 1000
     result["iobound_avg_wait_time"] = math.ceil(((data["iobound_turnaround_time"] / data["iobound_burst_times"])
                                                   - (data["iobound_cpu_burst_time"] / data["iobound_burst_times"]) - t_cs) * 1000) / 1000
     
-    result["avg_turnaround_time"] = math.ceil(((data["total_turnaround_time"] - data["total_io_elapsed_time"])
-                                                / data["total_cpu_burst_times"]) * 1000) / 1000
+    result["avg_turnaround_time"] = math.ceil((data["total_turnaround_time"] / data["total_cpu_burst_times"]) * 1000) / 1000
     result["cpubound_avg_turnaround_time"] = math.ceil((data["cpubound_turnaround_time"] / data["cpubound_burst_times"]) * 1000) / 1000
     result["iobound_avg_turnaround_time"] = math.ceil((data["iobound_turnaround_time"] / data["iobound_burst_times"]) * 1000) / 1000
 
@@ -50,15 +56,14 @@ def preemptive_result(data, result, t_cs):
     result["cpubound_avg_cpu_burst_time"] = math.ceil((data["cpubound_cpu_burst_time"] / data["cpubound_burst_times"]) * 1000) / 1000
     result["iobound_avg_cpu_burst_time"] = math.ceil((data["iobound_cpu_burst_time"] / data["iobound_burst_times"]) * 1000) / 1000
 
-    result["avg_wait_time"] = math.ceil((((data["total_turnaround_time"] - data["total_io_elapsed_time"]) 
-                                         / data["total_cpu_burst_times"]) - (data["total_cpu_elapsed_time"] / data["total_cpu_burst_times"]) - total_avg_context_switch) * 1000) / 1000
+    result["avg_wait_time"] = math.ceil(((data["total_turnaround_time"] / data["total_cpu_burst_times"]) - (data["total_cpu_elapsed_time"]
+                                                                                         / data["total_cpu_burst_times"]) - total_avg_context_switch) * 1000) / 1000
     result["cpubound_avg_wait_time"] = math.ceil(((data["cpubound_turnaround_time"] / data["cpubound_burst_times"]) - 
                                                   (data["cpubound_cpu_burst_time"] / data["cpubound_burst_times"]) - cpubound_avg_context_switch) * 1000) / 1000
     result["iobound_avg_wait_time"] = math.ceil(((data["iobound_turnaround_time"] / data["iobound_burst_times"])
                                                   - (data["iobound_cpu_burst_time"] / data["iobound_burst_times"]) - iobound_avg_context_switch) * 1000) / 1000
     
-    result["avg_turnaround_time"] = math.ceil(((data["total_turnaround_time"] - data["total_io_elapsed_time"])
-                                                / data["total_cpu_burst_times"]) * 1000) / 1000
+    result["avg_turnaround_time"] = math.ceil((data["total_turnaround_time"] / data["total_cpu_burst_times"]) * 1000) / 1000
     result["cpubound_avg_turnaround_time"] = math.ceil((data["cpubound_turnaround_time"] / data["cpubound_burst_times"]) * 1000) / 1000
     result["iobound_avg_turnaround_time"] = math.ceil((data["iobound_turnaround_time"] / data["iobound_burst_times"]) * 1000) / 1000
 
@@ -142,13 +147,6 @@ print()   #for part 1 comment out this line
     
 print("<<< PROJECT PART II -- t_cs={}ms; alpha={:.2f}; t_slice={}ms >>>".format(t_cs, alpha, t_slice))
 
-result_template = {"cpu_utilization" : 0,
-          "avg_cpu_burst_time" : 0, "cpubound_avg_cpu_burst_time" : 0, "iobound_avg_cpu_burst_time" : 0,
-          "avg_wait_time" : 0, "cpubound_avg_wait_time" : 0, "iobound_avg_wait_time" : 0,
-          "avg_turnaround_time" : 0, "cpubound_avg_turnaround_time" : 0, "iobound_avg_turnaround_time" : 0,
-          "context_switch" : 0, "cpu_context_switch" : 0, "io_context_switch" : 0,
-          "preemption" : 0, "cpu_preemption" : 0, "io_preemption" : 0}
-
 #First-come-first-served (FCFS)
 FCFS_data = FCFS(process_list, t_cs)
 FCFS_result = deepcopy(result_template)
@@ -171,28 +169,28 @@ FCFS_text = (
              FCFS_result["preemption"], FCFS_result["cpu_preemption"], FCFS_result["io_preemption"])
 
 #Shortest job first (SJF)
-# SJF_data = SJF(process_list, t_cs)
-# SJF_result = deepcopy(result_template)
+SJF_data = SJF(process_list, t_cs, alpha)
+SJF_result = deepcopy(result_template)
 
-# SJF_result = non_preemptive_result(SJF_data, SJF_result, t_cs)
+SJF_result = non_preemptive_result(SJF_data, SJF_result, t_cs)
 
-# SJF_text = (
-#         "Algorithm SJF\n"
-#         "-- CPU utilization: {:.3f}%\n"
-#         "-- average CPU burst time: {:.3f} ms ({:.3f} ms/{:.3f} ms)\n"
-#         "-- average wait time: {:.3f} ms ({:.3f} ms/{:.3f} ms)\n"
-#         "-- average turnaround time: {:.3f} ms ({:.3f} ms/{:.3f} ms)\n"
-#         "-- number of context switches: {:.0f} ({:.0f}/{:.0f})\n"
-#         "-- number of preemptions: {} ({}/{})\n"
-#     ).format(SJF_result["cpu_utilization"],
-#              SJF_result["avg_cpu_burst_time"], SJF_result["cpubound_avg_cpu_burst_time"], SJF_result["iobound_avg_cpu_burst_time"],
-#              SJF_result["avg_wait_time"], SJF_result["cpubound_avg_wait_time"], SJF_result["iobound_avg_wait_time"],
-#              SJF_result["avg_turnaround_time"], SJF_result["cpubound_avg_turnaround_time"], SJF_result["iobound_avg_turnaround_time"],
-#              SJF_result["context_switch"], SJF_result["cpu_context_switch"], SJF_result["io_context_switch"],
-#              SJF_result["preemption"], SJF_result["cpu_preemption"], SJF_result["io_preemption"])
+SJF_text = (
+        "Algorithm SJF\n"
+        "-- CPU utilization: {:.3f}%\n"
+        "-- average CPU burst time: {:.3f} ms ({:.3f} ms/{:.3f} ms)\n"
+        "-- average wait time: {:.3f} ms ({:.3f} ms/{:.3f} ms)\n"
+        "-- average turnaround time: {:.3f} ms ({:.3f} ms/{:.3f} ms)\n"
+        "-- number of context switches: {:.0f} ({:.0f}/{:.0f})\n"
+        "-- number of preemptions: {} ({}/{})\n\n"
+    ).format(SJF_result["cpu_utilization"],
+             SJF_result["avg_cpu_burst_time"], SJF_result["cpubound_avg_cpu_burst_time"], SJF_result["iobound_avg_cpu_burst_time"],
+             SJF_result["avg_wait_time"], SJF_result["cpubound_avg_wait_time"], SJF_result["iobound_avg_wait_time"],
+             SJF_result["avg_turnaround_time"], SJF_result["cpubound_avg_turnaround_time"], SJF_result["iobound_avg_turnaround_time"],
+             SJF_result["context_switch"], SJF_result["cpu_context_switch"], SJF_result["io_context_switch"],
+             SJF_result["preemption"], SJF_result["cpu_preemption"], SJF_result["io_preemption"])
 
 
-# #Shortest remaining time (SRT)
+#Shortest remaining time (SRT)
 # SRT_data = SRT(process_list, t_cs)
 # SRT_result = deepcopy(result_template)
 
@@ -235,7 +233,7 @@ RR_text = (
              RR_result["context_switch"], RR_result["cpu_context_switch"], RR_result["io_context_switch"],
              RR_result["preemption"], RR_result["cpu_preemption"], RR_result["io_preemption"])
 
-Final_output = FCFS_text + RR_text #+ SJF_text + SRT_text
+Final_output = FCFS_text + SJF_text + RR_text #+ SRT_text
 
 with open('project/simout.txt', 'w') as file:
     # Write Final output to the file
