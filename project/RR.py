@@ -237,74 +237,40 @@ def RR (process_list, t_cs, t_slice):
         time += 1
         
     print("time {}ms: Simulator ended for RR {}\n".format(time, print_ready_Q(ready_Q)))
-
-    #Calculate all data needed for the output file, will use the variable created before algo simulation
-    rr_cpu_utilization = math.ceil(((rr_total_cpu_elapsed_time / time) * 100) * 1000) / 1000                                                         
-    rr_average_cpu_burst_time = 0                                                                                            
-    rr_average_wait_time = 0
-    rr_io_wait_time = 0
-    rr_cpu_wait_time = 0
-    rr_average_turnaround_time = 0
+                                                                                       
     rr_io_turnaround_time = 0
     rr_cpu_turnaround_time = 0
 
     #Use for loop to get the data calculated in the simulation
     for p in Finished_list:
         if p.get_ID() == "I/O-bound":
-            rr_io_wait_time += p.get_wait_time()
             rr_io_turnaround_time += p.get_turnaround_time()
         else:
-            rr_cpu_wait_time += p.get_wait_time()
             rr_cpu_turnaround_time += p.get_turnaround_time()
-        rr_average_wait_time += p.get_wait_time()
         rr_total_cpu_burst_times += p.get_cpu_burst_times()
-
-    #Final calculate the data after retriving all the data needed
-    #Below is the burst time calculation, uses math.ceil to round up to 3 decimal places
-    rr_average_cpu_burst_time = math.ceil((rr_total_cpu_elapsed_time / rr_total_cpu_burst_times) * 1000 ) / 1000
-    rr_cpubound_average_cpu_burst_time = math.ceil((rr_cpubound_cpu_burst_time / cpubound_burst_times) * 1000) / 1000
-    rr_iobound_average_cpu_burst_time = math.ceil((rr_iobound_cpu_burst_time / iobound_burst_times) * 1000) / 1000
-
-    #Below is the turnaround time calculation, first cluster is just turnaround time
+    
+    #Below is the turnaround time data preparation
     rr_total_turnaround_time = rr_io_turnaround_time + rr_cpu_turnaround_time
     rr_iobound_turnaround_time = rr_io_turnaround_time - rr_iobound_io_burst_time
     rr_cpubound_turnaround_time = rr_cpu_turnaround_time - rr_cpubound_io_burst_time
-    #Continue for turnaround time calculation, second cluster is average turnaround time
-    rr_average_turnaround_time = math.ceil(((rr_total_turnaround_time - rr_total_io_elapsed_time) / rr_total_cpu_burst_times) * 1000) / 1000
-    rr_average_cpubound_turnaround_time = math.ceil((rr_cpubound_turnaround_time / cpubound_burst_times) * 1000) / 1000
-    rr_average_iobound_turnaround_time = math.ceil((rr_iobound_turnaround_time / iobound_burst_times) * 1000) / 1000
 
-    #prepare the context switch time for calculation, since one cpu burst may have multiple context switch
-    rr_total_average_context_switch = ((context_switch * t_cs) / rr_total_cpu_burst_times)
-    rr_iobound_average_context_switch = ((io_context_switch * t_cs) / iobound_burst_times)
-    rr_cpubound_average_context_switch = ((cpu_context_switch * t_cs) / cpubound_burst_times)
-
-    #Below is the wait time calculation, first cluster is just wait time
-    rr_average_wait_time = math.ceil((((rr_total_turnaround_time - rr_total_io_elapsed_time) / rr_total_cpu_burst_times) - (rr_total_cpu_elapsed_time / rr_total_cpu_burst_times) - rr_total_average_context_switch) * 1000) / 1000
-    rr_average_cpubound_wait_time = math.ceil(((rr_cpubound_turnaround_time / cpubound_burst_times) - (rr_cpubound_cpu_burst_time / cpubound_burst_times) - rr_cpubound_average_context_switch) * 1000) / 1000
-    rr_average_iobound_wait_time = math.ceil(((rr_iobound_turnaround_time / iobound_burst_times) - (rr_iobound_cpu_burst_time / iobound_burst_times) - rr_iobound_average_context_switch) * 1000) / 1000
-
-    rr_context_switch = int(context_switch)
-    #Below is the preemption, take data from the recording during the simulation
-    rr_preemption = preemption
-    rr_io_preemption = io_preemption
-    rr_cpu_preemption = cpu_preemption
-
-    #Format the output file
-    RR_text = (
-        "Algorithm RR\n"
-        "-- CPU utilization: {:.3f}%\n"
-        "-- average CPU burst time: {:.3f} ms ({:.3f} ms/{:.3f} ms)\n"
-        "-- average wait time: {:.3f} ms ({:.3f} ms/{:.3f} ms)\n"
-        "-- average turnaround time: {:.3f} ms ({:.3f} ms/{:.3f} ms)\n"
-        "-- number of context switches: {:.0f} ({:.0f}/{:.0f})\n"
-        "-- number of preemptions: {} ({}/{})\n"
-    ).format(rr_cpu_utilization, 
-            rr_average_cpu_burst_time, rr_cpubound_average_cpu_burst_time, rr_iobound_average_cpu_burst_time,
-            rr_average_wait_time, rr_average_cpubound_wait_time, rr_average_iobound_wait_time, 
-            rr_average_turnaround_time, rr_average_cpubound_turnaround_time, rr_average_iobound_turnaround_time, 
-            rr_context_switch, cpu_context_switch, io_context_switch,  
-            rr_preemption, rr_cpu_preemption, rr_io_preemption)
+    RR_Dictionary = {"time": time,
+                     "total_cpu_elapsed_time": rr_total_cpu_elapsed_time, 
+                     "total_io_elapsed_time": rr_total_io_elapsed_time,
+                     "total_cpu_burst_times": rr_total_cpu_burst_times, 
+                     "cpubound_cpu_burst_time": rr_cpubound_cpu_burst_time,
+                     "iobound_cpu_burst_time": rr_iobound_cpu_burst_time,
+                     "cpubound_burst_times": cpubound_burst_times,
+                     "iobound_burst_times": iobound_burst_times,
+                     "total_turnaround_time": rr_total_turnaround_time,
+                     "iobound_turnaround_time": rr_iobound_turnaround_time,
+                     "cpubound_turnaround_time": rr_cpubound_turnaround_time,
+                     "context_switch": context_switch,
+                     "cpu_context_switch": cpu_context_switch,
+                     "io_context_switch": io_context_switch,
+                     "preemption": preemption,
+                     "io_preemption": io_preemption,
+                     "cpu_preemption": cpu_preemption,}
     
-    #Return the output file, and output to file in project.py
-    return RR_text
+    #Return the data needed for calculation in project.py
+    return RR_Dictionary
