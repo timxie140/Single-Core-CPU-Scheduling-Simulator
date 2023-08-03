@@ -17,22 +17,40 @@ result_template = {"cpu_utilization" : 0,
 
 #calculate non-preemptive algo's result
 def non_preemptive_result(data, result, t_cs):
-    result["cpu_utilization"] = math.ceil(((data["total_cpu_elapsed_time"] / data["time"]) * 100) * 1000) / 1000
+    if data["time"] == 0:
+        result["cpu_utilization"] = 0
+    else:
+         result["cpu_utilization"] = math.ceil(((data["total_cpu_elapsed_time"] / data["time"]) * 100) * 1000) / 1000
 
-    result["avg_cpu_burst_time"] = math.ceil((data["total_cpu_elapsed_time"] / data["total_cpu_burst_times"]) * 1000) / 1000
-    result["cpubound_avg_cpu_burst_time"] = math.ceil((data["cpubound_cpu_burst_time"] / data["cpubound_burst_times"]) * 1000) / 1000
-    result["iobound_avg_cpu_burst_time"] = math.ceil((data["iobound_cpu_burst_time"] / data["iobound_burst_times"]) * 1000) / 1000
+    if data["total_cpu_burst_times"] == 0:
+        result["avg_cpu_burst_time"] = 0
+        result["avg_turnaround_time"] = 0
+        result["avg_wait_time"] = 0
+    else:
+        result["avg_cpu_burst_time"] = math.ceil((data["total_cpu_elapsed_time"] / data["total_cpu_burst_times"]) * 1000) / 1000
+        result["avg_turnaround_time"] = math.ceil((data["total_turnaround_time"] / data["total_cpu_burst_times"]) * 1000) / 1000
+        result["avg_wait_time"] = math.ceil(((data["total_turnaround_time"] / data["total_cpu_burst_times"]) - (data["total_cpu_elapsed_time"]
+                                                                                 / data["total_cpu_burst_times"]) - t_cs) * 1000) / 1000
 
-    result["avg_wait_time"] = math.ceil((data["total_turnaround_time"] / data["total_cpu_burst_times"]- (data["total_cpu_elapsed_time"] 
-                                                                                                         / data["total_cpu_burst_times"]) - t_cs) * 1000) / 1000
-    result["cpubound_avg_wait_time"] = math.ceil(((data["cpubound_turnaround_time"] / data["cpubound_burst_times"]) - 
+    if data["cpubound_burst_times"] == 0:
+        result["cpubound_avg_cpu_burst_time"] = 0
+        result["cpubound_avg_wait_time"] = 0
+        result["cpubound_avg_turnaround_time"] = 0
+    else:
+        result["cpubound_avg_cpu_burst_time"] = math.ceil((data["cpubound_cpu_burst_time"] / data["cpubound_burst_times"]) * 1000) / 1000
+        result["cpubound_avg_wait_time"] = math.ceil(((data["cpubound_turnaround_time"] / data["cpubound_burst_times"]) - 
                                                   (data["cpubound_cpu_burst_time"] / data["cpubound_burst_times"]) - t_cs) * 1000) / 1000
-    result["iobound_avg_wait_time"] = math.ceil(((data["iobound_turnaround_time"] / data["iobound_burst_times"])
+        result["cpubound_avg_turnaround_time"] = math.ceil((data["cpubound_turnaround_time"] / data["cpubound_burst_times"]) * 1000) / 1000
+
+    if data["iobound_burst_times"] == 0:
+        result["iobound_avg_cpu_burst_time"] = 0
+        result["iobound_avg_wait_time"] = 0
+        result["iobound_avg_turnaround_time"] = 0
+    else:
+        result["iobound_avg_cpu_burst_time"] = math.ceil((data["iobound_cpu_burst_time"] / data["iobound_burst_times"]) * 1000) / 1000   
+        result["iobound_avg_wait_time"] = math.ceil(((data["iobound_turnaround_time"] / data["iobound_burst_times"])
                                                   - (data["iobound_cpu_burst_time"] / data["iobound_burst_times"]) - t_cs) * 1000) / 1000
-    
-    result["avg_turnaround_time"] = math.ceil((data["total_turnaround_time"] / data["total_cpu_burst_times"]) * 1000) / 1000
-    result["cpubound_avg_turnaround_time"] = math.ceil((data["cpubound_turnaround_time"] / data["cpubound_burst_times"]) * 1000) / 1000
-    result["iobound_avg_turnaround_time"] = math.ceil((data["iobound_turnaround_time"] / data["iobound_burst_times"]) * 1000) / 1000
+        result["iobound_avg_turnaround_time"] = math.ceil((data["iobound_turnaround_time"] / data["iobound_burst_times"]) * 1000) / 1000
 
     result["context_switch"] = data["context_switch"]
     result["cpu_context_switch"] = data["cpu_context_switch"]
@@ -46,26 +64,46 @@ def non_preemptive_result(data, result, t_cs):
 
 #calculate preemptive algo's result
 def preemptive_result(data, result, t_cs):
-    total_avg_context_switch = ((data["context_switch"] * t_cs) / data["total_cpu_burst_times"])
-    iobound_avg_context_switch = ((data["io_context_switch"] * t_cs) / data["iobound_burst_times"])
-    cpubound_avg_context_switch = ((data["cpu_context_switch"] * t_cs) / data["cpubound_burst_times"])
+    if data["time"] == 0:
+        result["cpu_utilization"] = 0
+    else:
+         result["cpu_utilization"] = math.ceil(((data["total_cpu_elapsed_time"] / data["time"]) * 100) * 1000) / 1000
 
-    result["cpu_utilization"] = math.ceil(((data["total_cpu_elapsed_time"] / data["time"]) * 100) * 1000) / 1000
+    if data["total_cpu_burst_times"] == 0:
+        result["avg_cpu_burst_time"] = 0
+        total_avg_context_switch = 0
+        result["avg_turnaround_time"] = 0
+        result["avg_wait_time"] = 0
+    else:
+        total_avg_context_switch = ((data["context_switch"] * t_cs) / data["total_cpu_burst_times"])
+        result["avg_cpu_burst_time"] = math.ceil((data["total_cpu_elapsed_time"] / data["total_cpu_burst_times"]) * 1000) / 1000
+        result["avg_turnaround_time"] = math.ceil((data["total_turnaround_time"] / data["total_cpu_burst_times"]) * 1000) / 1000
+        result["avg_wait_time"] = math.ceil(((data["total_turnaround_time"] / data["total_cpu_burst_times"]) - (data["total_cpu_elapsed_time"]
+                                                                                 / data["total_cpu_burst_times"]) - total_avg_context_switch) * 1000) / 1000
 
-    result["avg_cpu_burst_time"] = math.ceil((data["total_cpu_elapsed_time"] / data["total_cpu_burst_times"]) * 1000) / 1000
-    result["cpubound_avg_cpu_burst_time"] = math.ceil((data["cpubound_cpu_burst_time"] / data["cpubound_burst_times"]) * 1000) / 1000
-    result["iobound_avg_cpu_burst_time"] = math.ceil((data["iobound_cpu_burst_time"] / data["iobound_burst_times"]) * 1000) / 1000
-
-    result["avg_wait_time"] = math.ceil(((data["total_turnaround_time"] / data["total_cpu_burst_times"]) - (data["total_cpu_elapsed_time"]
-                                                                                         / data["total_cpu_burst_times"]) - total_avg_context_switch) * 1000) / 1000
-    result["cpubound_avg_wait_time"] = math.ceil(((data["cpubound_turnaround_time"] / data["cpubound_burst_times"]) - 
+    if data["cpubound_burst_times"] == 0:
+        cpubound_avg_context_switch = 0
+        result["cpubound_avg_cpu_burst_time"] = 0
+        result["cpubound_avg_wait_time"] = 0
+        result["cpubound_avg_turnaround_time"] = 0
+    else:
+        cpubound_avg_context_switch = ((data["cpu_context_switch"] * t_cs) / data["cpubound_burst_times"])
+        result["cpubound_avg_cpu_burst_time"] = math.ceil((data["cpubound_cpu_burst_time"] / data["cpubound_burst_times"]) * 1000) / 1000
+        result["cpubound_avg_wait_time"] = math.ceil(((data["cpubound_turnaround_time"] / data["cpubound_burst_times"]) - 
                                                   (data["cpubound_cpu_burst_time"] / data["cpubound_burst_times"]) - cpubound_avg_context_switch) * 1000) / 1000
-    result["iobound_avg_wait_time"] = math.ceil(((data["iobound_turnaround_time"] / data["iobound_burst_times"])
+        result["cpubound_avg_turnaround_time"] = math.ceil((data["cpubound_turnaround_time"] / data["cpubound_burst_times"]) * 1000) / 1000
+
+    if data["iobound_burst_times"] == 0:
+        iobound_avg_context_switch = 0
+        result["iobound_avg_cpu_burst_time"] = 0
+        result["iobound_avg_wait_time"] = 0
+        result["iobound_avg_turnaround_time"] = 0
+    else:
+        iobound_avg_context_switch = ((data["io_context_switch"] * t_cs) / data["iobound_burst_times"]) 
+        result["iobound_avg_cpu_burst_time"] = math.ceil((data["iobound_cpu_burst_time"] / data["iobound_burst_times"]) * 1000) / 1000   
+        result["iobound_avg_wait_time"] = math.ceil(((data["iobound_turnaround_time"] / data["iobound_burst_times"])
                                                   - (data["iobound_cpu_burst_time"] / data["iobound_burst_times"]) - iobound_avg_context_switch) * 1000) / 1000
-    
-    result["avg_turnaround_time"] = math.ceil((data["total_turnaround_time"] / data["total_cpu_burst_times"]) * 1000) / 1000
-    result["cpubound_avg_turnaround_time"] = math.ceil((data["cpubound_turnaround_time"] / data["cpubound_burst_times"]) * 1000) / 1000
-    result["iobound_avg_turnaround_time"] = math.ceil((data["iobound_turnaround_time"] / data["iobound_burst_times"]) * 1000) / 1000
+        result["iobound_avg_turnaround_time"] = math.ceil((data["iobound_turnaround_time"] / data["iobound_burst_times"]) * 1000) / 1000
 
     result["context_switch"] = data["context_switch"]
     result["cpu_context_switch"] = data["cpu_context_switch"]
@@ -88,12 +126,12 @@ try:
     alpha = float(sys.argv[7])
     t_slice = int(sys.argv[8])
 except (IndexError, ValueError):
-    print("Usage: python3 project.py (number of process) (number of process bound with cpu) (random seed) (lambda) (upperLimit)")
+    print('ERROR: Usage: python3 project.py (number of process) (number of process bound with cpu) (random seed) (lambda) (upperLimit)', file=sys.stderr)
     sys.exit(1)
 
 #Check if the input is in the valid range
 if n < 0 or ncpu < 0 or upperLimit < 0:
-    print("Error: Invalid input either n, ncpu or upperLimit is negative please use positive integer")
+    print("ERROR: Invalid input either n, ncpu or upperLimit is negative please use positive integer")
     sys.exit(1)
 
 #create random number generator
