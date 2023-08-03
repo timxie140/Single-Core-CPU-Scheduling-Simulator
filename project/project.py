@@ -130,8 +130,16 @@ except (IndexError, ValueError):
     sys.exit(1)
 
 #Check if the input is in the valid range
-if n < 0 or ncpu < 0 or upperLimit < 0:
-    print("ERROR: Invalid input either n, ncpu or upperLimit is negative please use positive integer")
+if n < 0 or ncpu < 0 or upperLimit < 0 or alpha < 0:
+    print("ERROR: Invalid input either number of processes(arg1), number of cpu-bound processes(arg2), upperLimit(arg5) or alpha number(arg7/range between 0 to 1) is negative please use positive integer", file=sys.stderr)
+    sys.exit(1)
+
+if ncpu > n:
+    print("ERROR: Invalid input can't have cpu-bound process number(arg2) greater than total process number(arg1)", file=sys.stderr)
+    sys.exit(1)
+
+if alpha > 1:
+    print("ERROR: Invalid input alpha number(arg7) is greater than 1 please use number between 0 and 1", file=sys.stderr)
     sys.exit(1)
 
 #create random number generator
