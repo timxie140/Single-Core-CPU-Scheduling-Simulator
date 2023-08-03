@@ -41,21 +41,9 @@ class Process(object):
 
     def set_turnaround_end(self, turnaround_time_end):
         self.turnaround_time_end = turnaround_time_end
-    
-    def set_wait_start(self, wait_time_start):
-        self.wait_time_start = wait_time_start
-
-    def set_wait_end(self, wait_time_end):
-        self.wait_time_end = wait_time_end
 
     def cal_turnaround_time(self):
         self.turnaround_time += self.turnaround_time_end - self.turnaround_time_start
-    
-    def cal_wait_time(self):
-        self.wait_time += self.wait_time_end - self.wait_time_start
-
-    def adjust_wait_time(self):
-        self.wait_time -= 1
     
     def set_cpu_burst_stop_time(self, cpu_burst_stop_time):
         self.cpu_burst_stop_time = cpu_burst_stop_time
