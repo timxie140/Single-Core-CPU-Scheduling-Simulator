@@ -236,7 +236,7 @@ def RR (process_list, t_cs, t_slice):
           
         time += 1
         
-    print("time {}ms: Simulator ended for RR {}\n".format(time, print_ready_Q(ready_Q)))
+    print("time {}ms: Simulator ended for RR {}".format(time, print_ready_Q(ready_Q)))
                                                                                        
     rr_io_turnaround_time = 0
     rr_cpu_turnaround_time = 0
