@@ -235,6 +235,6 @@ RR_text = (
 
 Final_output = FCFS_text + SJF_text + SRT_text + RR_text
 
-with open('project/simout.txt', 'w') as file:
+with open('simout.txt', 'w') as file:
     # Write Final output to the file
     file.write(Final_output)
