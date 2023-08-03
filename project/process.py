@@ -13,10 +13,10 @@ class Process(object):
         self.wait_time = 0
         self.wait_time_start = 0
         self.wait_time_end = 0
-        self.tau = 1 / _lambda
+        self.tau = int(1 / _lambda)
         self.remaining_time = -1
         self.predict_cpu_burst_stop_time = 0
-        self.predict_remain_time = 0
+        self.predict_remain_time = self.tau
     #Below is the concatenation of the string that will be printed out
     def __str__(self) -> str:
         s = ""
@@ -71,6 +71,7 @@ class Process(object):
 
     def set_tau(self, new_tau):
         self.tau = new_tau
+        self.predict_remain_time = new_tau
         
     def change_io_burst(self):
         self.io_burst_list.pop(0)
@@ -133,6 +134,9 @@ class Process(object):
     def get_remain_predict_time(self, time):
         self.predict_remain_time = self.predict_cpu_burst_stop_time - time
         return self.predict_cpu_burst_stop_time - time
+    
+    def get_predict_time(self):
+        return self.predict_remain_time
     
     #Below are getter/setter specific for RR/SRT algo
     #setter
