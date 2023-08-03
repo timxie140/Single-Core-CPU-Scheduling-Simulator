@@ -21,9 +21,7 @@ def find_shortest_tau(Q):
     return process_index
 
 def find_new_tau(alpha, old_tau, burst_time):
-    result = (alpha * burst_time) + ((1-alpha) * old_tau)
-    if math.ceil(result) == result:
-        return int (result + 1)
+    result = (alpha * burst_time) + ((1 - alpha) * old_tau)
     return math.ceil(result)
 
 def find_complete_IO(time, io_p):
