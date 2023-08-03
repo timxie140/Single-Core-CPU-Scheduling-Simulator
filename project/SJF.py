@@ -22,6 +22,8 @@ def find_shortest_tau(Q):
 
 def find_new_tau(alpha, old_tau, burst_time):
     result = (alpha * burst_time) + ((1-alpha) * old_tau)
+    if math.ceil(result) == result:
+        return int (result + 1)
     return math.ceil(result)
 
 def find_complete_IO(time, io_p):
@@ -105,10 +107,11 @@ def SJF(process_list, t_cs, alpha):
             if cpu_p != None:
                 if cur_time == cpu_p.get_cpu_burst_stop_time():
                     if cpu_p.get_cpu_burst_times()-1 != 0:
-                        if (cpu_p.get_cpu_burst_times()-1)>1 :
-                            print("time {}ms: Process {} (tau {}ms) completed a CPU burst; {} bursts to go {}".format(cur_time, cpu_p.get_pid(), cpu_p.get_tau(), cpu_p.get_cpu_burst_times()-1, print_ready_Q(Q)))
-                        else:
-                            print("time {}ms: Process {} (tau {}ms) completed a CPU burst; {} burst to go {}".format(cur_time, cpu_p.get_pid(), cpu_p.get_tau(), cpu_p.get_cpu_burst_times()-1, print_ready_Q(Q)))
+                        if cur_time<10000:
+                            if (cpu_p.get_cpu_burst_times()-1)>1 :
+                                print("time {}ms: Process {} (tau {}ms) completed a CPU burst; {} bursts to go {}".format(cur_time, cpu_p.get_pid(), cpu_p.get_tau(), cpu_p.get_cpu_burst_times()-1, print_ready_Q(Q)))
+                            else:
+                                print("time {}ms: Process {} (tau {}ms) completed a CPU burst; {} burst to go {}".format(cur_time, cpu_p.get_pid(), cpu_p.get_tau(), cpu_p.get_cpu_burst_times()-1, print_ready_Q(Q)))
 
                     elif cpu_p.get_cpu_burst_times()-1 == 0:
                         cpu_p.change_cpu_burst()
@@ -207,7 +210,7 @@ def SJF(process_list, t_cs, alpha):
     if context_status == 1:
         cur_time+=half_t_cs
 
-    print("time {}ms: Simulator ended for SJF [Q <empty>]".format(cur_time))
+    print("time {}ms: Simulator ended for SJF [Q <empty>]\n".format(cur_time))
 
     total_turn_time = sum(cpu_turn.values())+sum(io_turn.values()) - io_burst
     cpubound_turn_time = sum(cpu_turn.values()) - cpubound_io_burst_time
