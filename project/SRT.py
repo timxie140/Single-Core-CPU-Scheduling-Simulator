@@ -405,8 +405,6 @@ while(living_p!= 0):
                 io_p.pop(index)
 
     cur_time += 1
-    if cur_time == 159667:
-        stop = True
 
 if context_status == 1:
     cur_time+=half_t_cs
