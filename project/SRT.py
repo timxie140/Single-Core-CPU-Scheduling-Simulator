@@ -1,4 +1,4 @@
-import math
+from math import ceil
 from copy import deepcopy
 
 def print_ready_Q(ready_Q):
@@ -22,7 +22,7 @@ def find_shortest_tau(Q):
 
 def find_new_tau(alpha, old_tau, burst_time):
     result = (alpha * burst_time) + ((1 - alpha) * old_tau)
-    return math.ceil(result)
+    return ceil(result + 0.00000001)
 
 def find_complete_IO(time, io_p):
     index = -1
