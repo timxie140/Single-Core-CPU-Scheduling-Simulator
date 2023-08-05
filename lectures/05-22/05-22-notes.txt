@@ -1,0 +1,60 @@
+[05/22/2023]
+
+What is an operating system?
+
+**** a (large-scale) program that allocates and manages resources for other programs ****
+
+    OPERATING SYSTEM  ==  RESOURCE MANAGER
+
+
+-- Resource allocation
+   (memory management, process scheduling, disk access, I/O, etc.)
+
+-- Program execution -- fork()
+   (load programs into memory, run/suspend/terminate programs,
+    handle/display errors)
+
+-- Filesystem manipulation
+   (read/write/traverse filesystem directories,
+    read/write/traverse files, enforce permissions/security)
+
+-- Interprocess Communication (IPC)
+   (processes exchange information via shared memory,
+    message passing, sockets, pipes, files, etc.)
+   (key challenge: synchronization)
+
+-- Error detection and recovery
+   (Detect errors in CPU, memory, I/O, processes, etc.)
+   (Recover from errors gracefully)
+
+-- Account and resource protection/security
+   (Users, groups, account verification, memory protection, etc.)
+
+-- Usage monitoring
+   (processes, users, networks, log files, etc.)
+
+
+
+
+ PROCESS (in memory)
+
+ +-----------------------------+
+ | runtime heap                | <== dynamic allocation
+ |      |                      |     -- the "new" keyword in C++/Java
+ |      |                      |     -- in C, malloc(), calloc(),
+ |      |                      |         realloc(), and free()
+ |      v                      |
+ |                             |
+ |                             |
+ |                             |
+ |                             |
+ |      ^                      |
+ |      |main()                |
+ |      | int i (4 bytes)      |
+ |      | float j (4 bytes)    |
+ |      |                      |
+ |      |                      |
+ | runtime stack               | <== static allocation
+ |-----------------------------|     (e.g., int x, char * y)
+ | code/data/text              |
+ +-----------------------------+

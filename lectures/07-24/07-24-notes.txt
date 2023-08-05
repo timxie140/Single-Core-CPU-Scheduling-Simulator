@@ -1,0 +1,25 @@
+[07/24/2023]
+
+==> https://www.cs.rpi.edu/~goldsd/u23/
+
+Project Part II posted (PDF specifications)
+
+LecEx3 gradeable available --- due by 11:59PM Thu Jul 27
+
+Homework 3 (final assignment) TBA by end of this week
+
+=============================================================================
+
+bash$ host www.rpi.edu
+www.rpi.edu has address 128.113.0.2
+
+  128 in base 2:    10000000 01110001 ...
+                      ^^^^^^^^^^^^^^^
+                       NetID for RPI
+
+bash$ host ucla.edu
+ucla.edu has address 15.197.181.170
+
+   15 in base 2:    00001111 ...
+
+

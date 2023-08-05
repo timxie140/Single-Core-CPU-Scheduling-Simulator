@@ -1,0 +1,33 @@
+[07/31/2023]
+
+SERVER TYPES:
+
+(0) Iterative server (often UDP): accept incoming UDP datagrams on
+     a specified port number (udp-server.c); or accept and handle
+      TCP connections one at a time or serially (tcp-server-iterative.c)
+
+(1) fork()-based server (tcp-server-fork.c): a child process is created
+     to handle each rcvd/accepted TCP client connection
+
+(2) fork()-based server with pre-forked processes: pre-fork() N processes,
+     then as incoming TCP client connection requests come in, assign them
+      to child processes (which requires shared memory, synchronization, etc.)
+
+(3) thread-based server (Homework 3): a child thread is created
+     to handle each rcvd/accepted TCP client connection
+
+(4) thread-based server with pre-spawned threads: pre-spawn N threads,
+     then as incoming TCP client connection requests come in, assign them
+      to child threads (which requires synchronization!)
+
+(5) select()-based (multiplex) server: a single process (no multi-threading)
+     that uses the select() system call, which enables the process to poll
+      multiple descriptors and check for activity on any of them
+       (tcp-server-multiplex.c)
+
+    this approach eliminates the need (complexity/overhead) of
+     multiple processes or multiple threads....
+
+    ...but this is then an iterative server
+
+    (and we can use select() on ANY type of descriptor)
