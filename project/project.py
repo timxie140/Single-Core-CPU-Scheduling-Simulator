@@ -1,5 +1,6 @@
-import sys
-import math
+import os
+os.environ['OPENBLAS_NUM_THREADS'] = '1'
+
 from numpy import float32 as f32
 from drand48 import Rand48
 from process import Process
@@ -8,6 +9,8 @@ from FCFS import FCFS
 from SJF import SJF
 from SRT import SRT
 from RR import RR
+import sys
+import math
 
 result_template = {"cpu_utilization" : 0,
           "avg_cpu_burst_time" : 0, "cpubound_avg_cpu_burst_time" : 0, "iobound_avg_cpu_burst_time" : 0,
