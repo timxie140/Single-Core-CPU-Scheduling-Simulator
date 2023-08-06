@@ -1,5 +1,3 @@
-from math import ceil
-
 class Process(object):
     def __init__(self, arrival_time, ID, pid, _lambda):
         self.arrival_time = arrival_time
@@ -12,7 +10,7 @@ class Process(object):
         self.turnaround_time = 0
         self.turnaround_time_start = 0
         self.turnaround_time_end = 0
-        self.tau = ceil(1.0 / _lambda)
+        self.tau = round(1.0 / _lambda)
         self.remaining_time = -1
         self.predict_cpu_burst_stop_time = 0
         self.predict_remain_time = self.tau
