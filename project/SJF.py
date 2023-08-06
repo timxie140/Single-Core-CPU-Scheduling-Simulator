@@ -1,4 +1,5 @@
 from math import ceil
+from numpy import float32 as f32
 from copy import deepcopy
 
 def print_ready_Q(ready_Q):
@@ -21,8 +22,8 @@ def find_shortest_tau(Q):
     return process_index
 
 def find_new_tau(alpha, old_tau, burst_time):
-    result = (alpha * burst_time) + ((1 - alpha) * old_tau)
-    return ceil(result + 0.0000001)
+    result = (alpha * f32(burst_time)) + ((1 - alpha) * f32(old_tau))
+    return ceil(f32(result))
 
 def find_complete_IO(time, io_p):
     index = -1

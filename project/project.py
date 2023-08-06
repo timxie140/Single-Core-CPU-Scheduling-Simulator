@@ -1,5 +1,6 @@
 import sys
 import math
+from numpy import float32 as f32
 from drand48 import Rand48
 from process import Process
 from copy import deepcopy
@@ -120,10 +121,10 @@ try:
     n = int(sys.argv[1])
     ncpu = int(sys.argv[2])
     seed = int(sys.argv[3])
-    _lambda = float(sys.argv[4])
+    _lambda = f32(sys.argv[4])
     upperLimit = int(sys.argv[5])
     t_cs = int(sys.argv[6])
-    alpha = float(sys.argv[7])
+    alpha = f32(sys.argv[7])
     t_slice = int(sys.argv[8])
 except (IndexError, ValueError):
     print('ERROR: Usage: python3 project.py (number of process) (number of process bound with cpu) (random seed) (lambda) (upperLimit)', file=sys.stderr)
@@ -199,20 +200,20 @@ FCFS_result = deepcopy(result_template)
 
 FCFS_result = non_preemptive_result(FCFS_data, FCFS_result, t_cs)
 
-FCFS_text = (
-        "Algorithm FCFS\n"
-        "-- CPU utilization: {:.3f}%\n"
-        "-- average CPU burst time: {:.3f} ms ({:.3f} ms/{:.3f} ms)\n"
-        "-- average wait time: {:.3f} ms ({:.3f} ms/{:.3f} ms)\n"
-        "-- average turnaround time: {:.3f} ms ({:.3f} ms/{:.3f} ms)\n"
-        "-- number of context switches: {:.0f} ({:.0f}/{:.0f})\n"
-        "-- number of preemptions: {} ({}/{})\n\n"
-    ).format(FCFS_result["cpu_utilization"], 
-             FCFS_result["avg_cpu_burst_time"], FCFS_result["cpubound_avg_cpu_burst_time"], FCFS_result["iobound_avg_cpu_burst_time"],
-             FCFS_result["avg_wait_time"], FCFS_result["cpubound_avg_wait_time"], FCFS_result["iobound_avg_wait_time"],
-             FCFS_result["avg_turnaround_time"], FCFS_result["cpubound_avg_turnaround_time"], FCFS_result["iobound_avg_turnaround_time"],
-             FCFS_result["context_switch"], FCFS_result["cpu_context_switch"], FCFS_result["io_context_switch"],
-             FCFS_result["preemption"], FCFS_result["cpu_preemption"], FCFS_result["io_preemption"])
+# FCFS_text = (
+#         "Algorithm FCFS\n"
+#         "-- CPU utilization: {:.3f}%\n"
+#         "-- average CPU burst time: {:.3f} ms ({:.3f} ms/{:.3f} ms)\n"
+#         "-- average wait time: {:.3f} ms ({:.3f} ms/{:.3f} ms)\n"
+#         "-- average turnaround time: {:.3f} ms ({:.3f} ms/{:.3f} ms)\n"
+#         "-- number of context switches: {:.0f} ({:.0f}/{:.0f})\n"
+#         "-- number of preemptions: {} ({}/{})\n\n"
+#     ).format(FCFS_result["cpu_utilization"], 
+#              FCFS_result["avg_cpu_burst_time"], FCFS_result["cpubound_avg_cpu_burst_time"], FCFS_result["iobound_avg_cpu_burst_time"],
+#              FCFS_result["avg_wait_time"], FCFS_result["cpubound_avg_wait_time"], FCFS_result["iobound_avg_wait_time"],
+#              FCFS_result["avg_turnaround_time"], FCFS_result["cpubound_avg_turnaround_time"], FCFS_result["iobound_avg_turnaround_time"],
+#              FCFS_result["context_switch"], FCFS_result["cpu_context_switch"], FCFS_result["io_context_switch"],
+#              FCFS_result["preemption"], FCFS_result["cpu_preemption"], FCFS_result["io_preemption"])
 
 #Shortest job first (SJF)
 SJF_data = SJF(process_list, t_cs, alpha)
@@ -242,20 +243,20 @@ SRT_result = deepcopy(result_template)
 
 SRT_result = preemptive_result(SRT_data, SRT_result, t_cs)
 
-SRT_text = (
-        "Algorithm SRT\n"
-        "-- CPU utilization: {:.3f}%\n"
-        "-- average CPU burst time: {:.3f} ms ({:.3f} ms/{:.3f} ms)\n"
-        "-- average wait time: {:.3f} ms ({:.3f} ms/{:.3f} ms)\n"
-        "-- average turnaround time: {:.3f} ms ({:.3f} ms/{:.3f} ms)\n"
-        "-- number of context switches: {:.0f} ({:.0f}/{:.0f})\n"
-        "-- number of preemptions: {} ({}/{})\n\n"
-    ).format(SRT_result["cpu_utilization"],
-             SRT_result["avg_cpu_burst_time"], SRT_result["cpubound_avg_cpu_burst_time"], SRT_result["iobound_avg_cpu_burst_time"],
-             SRT_result["avg_wait_time"], SRT_result["cpubound_avg_wait_time"], SRT_result["iobound_avg_wait_time"],
-             SRT_result["avg_turnaround_time"], SRT_result["cpubound_avg_turnaround_time"], SRT_result["iobound_avg_turnaround_time"],
-             SRT_result["context_switch"], SRT_result["cpu_context_switch"], SRT_result["io_context_switch"],
-             SRT_result["preemption"], SRT_result["cpu_preemption"], SRT_result["io_preemption"])
+# SRT_text = (
+#         "Algorithm SRT\n"
+#         "-- CPU utilization: {:.3f}%\n"
+#         "-- average CPU burst time: {:.3f} ms ({:.3f} ms/{:.3f} ms)\n"
+#         "-- average wait time: {:.3f} ms ({:.3f} ms/{:.3f} ms)\n"
+#         "-- average turnaround time: {:.3f} ms ({:.3f} ms/{:.3f} ms)\n"
+#         "-- number of context switches: {:.0f} ({:.0f}/{:.0f})\n"
+#         "-- number of preemptions: {} ({}/{})\n\n"
+#     ).format(SRT_result["cpu_utilization"],
+#              SRT_result["avg_cpu_burst_time"], SRT_result["cpubound_avg_cpu_burst_time"], SRT_result["iobound_avg_cpu_burst_time"],
+#              SRT_result["avg_wait_time"], SRT_result["cpubound_avg_wait_time"], SRT_result["iobound_avg_wait_time"],
+#              SRT_result["avg_turnaround_time"], SRT_result["cpubound_avg_turnaround_time"], SRT_result["iobound_avg_turnaround_time"],
+#              SRT_result["context_switch"], SRT_result["cpu_context_switch"], SRT_result["io_context_switch"],
+#              SRT_result["preemption"], SRT_result["cpu_preemption"], SRT_result["io_preemption"])
 
 
 #Round robin (RR)
@@ -264,22 +265,22 @@ RR_result = deepcopy(result_template)
 
 RR_result = preemptive_result(RR_data, RR_result, t_cs)
 
-RR_text = (
-        "Algorithm RR\n"
-        "-- CPU utilization: {:.3f}%\n"
-        "-- average CPU burst time: {:.3f} ms ({:.3f} ms/{:.3f} ms)\n"
-        "-- average wait time: {:.3f} ms ({:.3f} ms/{:.3f} ms)\n"
-        "-- average turnaround time: {:.3f} ms ({:.3f} ms/{:.3f} ms)\n"
-        "-- number of context switches: {:.0f} ({:.0f}/{:.0f})\n"
-        "-- number of preemptions: {} ({}/{})\n"
-    ).format(RR_result["cpu_utilization"],
-             RR_result["avg_cpu_burst_time"], RR_result["cpubound_avg_cpu_burst_time"], RR_result["iobound_avg_cpu_burst_time"],
-             RR_result["avg_wait_time"], RR_result["cpubound_avg_wait_time"], RR_result["iobound_avg_wait_time"],
-             RR_result["avg_turnaround_time"], RR_result["cpubound_avg_turnaround_time"], RR_result["iobound_avg_turnaround_time"],
-             RR_result["context_switch"], RR_result["cpu_context_switch"], RR_result["io_context_switch"],
-             RR_result["preemption"], RR_result["cpu_preemption"], RR_result["io_preemption"])
+# RR_text = (
+#         "Algorithm RR\n"
+#         "-- CPU utilization: {:.3f}%\n"
+#         "-- average CPU burst time: {:.3f} ms ({:.3f} ms/{:.3f} ms)\n"
+#         "-- average wait time: {:.3f} ms ({:.3f} ms/{:.3f} ms)\n"
+#         "-- average turnaround time: {:.3f} ms ({:.3f} ms/{:.3f} ms)\n"
+#         "-- number of context switches: {:.0f} ({:.0f}/{:.0f})\n"
+#         "-- number of preemptions: {} ({}/{})\n"
+#     ).format(RR_result["cpu_utilization"],
+#              RR_result["avg_cpu_burst_time"], RR_result["cpubound_avg_cpu_burst_time"], RR_result["iobound_avg_cpu_burst_time"],
+#              RR_result["avg_wait_time"], RR_result["cpubound_avg_wait_time"], RR_result["iobound_avg_wait_time"],
+#              RR_result["avg_turnaround_time"], RR_result["cpubound_avg_turnaround_time"], RR_result["iobound_avg_turnaround_time"],
+#              RR_result["context_switch"], RR_result["cpu_context_switch"], RR_result["io_context_switch"],
+#              RR_result["preemption"], RR_result["cpu_preemption"], RR_result["io_preemption"])
 
-Final_output = FCFS_text + SJF_text + SRT_text + RR_text
+Final_output = SJF_text #FCFS_text + SJF_text + SRT_text + RR_text
 
 with open('simout.txt', 'w') as file:
     # Write Final output to the file
