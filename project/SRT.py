@@ -225,9 +225,7 @@ def SRT(process_list, t_cs, alpha):
                 cpu_p.set_remaining_time(cpu_p.get_cpu_burst_stop_time()-cur_time)
             else:
                 cpu_p.set_remaining_time(-1)
-            Q.append(cpu_p)
-            Q.sort(key=lambda x: x.get_pid())
-            Q.sort(key=lambda x: x.get_predict_time())
+           
 
             if(cpu_p.get_ID() == "CPU-bound"):
                 cpu_switchs+=0.5
@@ -237,24 +235,32 @@ def SRT(process_list, t_cs, alpha):
                 io_preemp += 1
             
 
-            cpu_p = Q[0]
-            Q.pop(0)
-
             for i in range(half_t_cs):
                 io_process(io_p,cur_time+i, Q)
 
             #new switch in
+            Q.append(cpu_p)
+            Q.sort(key=lambda x: x.get_pid())
+            Q.sort(key=lambda x: x.get_predict_time())
+
+            io_process(io_p, cur_time+half_t_cs, Q)
+
+            cpu_p = Q[0]
+            Q.pop(0)
+
             cpu_p.set_cpu_burst_stop_time(cur_time + t_cs + cpu_p.get_cpu_burst_time(0))
             cpu_p.set_predict_cpu_burst_stop_time(cur_time + t_cs)
+
+            for i in range(half_t_cs-1):
+                io_process(io_p,cur_time+half_t_cs+1+i, Q)
+
             if cur_time < 10000:
                 print("time {}ms: Process {} (tau {}ms) started using the CPU for {}ms burst {}".format(cur_time+t_cs, cpu_p.get_pid(), cpu_p.get_tau(), cpu_p.get_cpu_burst_time(0), print_ready_Q(Q)))
+                
             if(cpu_p.get_ID() == "CPU-bound"):
                 cpu_switchs+=0.5
             else:
                 io_switchs+=0.5
-
-            for i in range(half_t_cs):
-                io_process(io_p,cur_time+half_t_cs+i, Q)
                 
             switchs+=1
             cur_time += t_cs
@@ -308,8 +314,10 @@ def SRT(process_list, t_cs, alpha):
 
                     for i in range(half_t_cs-1):
                         io_process(io_p, cur_time+half_t_cs+1+i, Q)
-                    if cur_time<10000:
+
+                    if cur_time < 10000:
                         print("time {}ms: Process {} (tau {}ms) started using the CPU for {}ms burst {}".format(cur_time+t_cs, cpu_p.get_pid(), cpu_p.get_tau(), cpu_p.get_cpu_burst_time(0), print_ready_Q(Q)))
+
                     if(cpu_p.get_ID() == "CPU-bound"):
                         cpu_switchs+=0.5
                     else:

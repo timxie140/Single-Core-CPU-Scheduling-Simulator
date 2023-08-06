@@ -2,3 +2,4 @@ project/__pycache__
 .vscode
 simout.txt
 checking.txt
+project/get-pip.py
