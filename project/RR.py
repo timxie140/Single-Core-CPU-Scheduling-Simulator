@@ -143,11 +143,8 @@ def RR (process_list, t_cs, t_slice):
             cpu_p.change_cpu_burst()
             cpu_p.set_slice_stop_time(-1)
             RUNNING = 0
-            s = ''
-            if cpu_p.get_cpu_burst_times() != 1:
-                s = 's'
             if time < print_time_limit and cpu_p.get_cpu_burst_times() != 0:
-                print("time {}ms: Process {} completed a CPU burst; {} burst{} to go {}".format(time, cpu_p.get_pid(), cpu_p.get_cpu_burst_times(), s, print_ready_Q(ready_Q)))
+                print("time {}ms: Process {} completed a CPU burst; {} burst{} to go {}".format(time, cpu_p.get_pid(), cpu_p.get_cpu_burst_times(), 's' if cpu_p.get_cpu_burst_times() > 1 else '', print_ready_Q(ready_Q)))
             
             #Determine if the process should be terminated, then add it to the finished list, by checking if there's cpu burst times left
             if cpu_p.get_cpu_burst_times() == 0:

@@ -121,7 +121,7 @@ try:
     n = int(sys.argv[1])
     ncpu = int(sys.argv[2])
     seed = int(sys.argv[3])
-    _lambda = f32(sys.argv[4])
+    _lambda = float(sys.argv[4])
     upperLimit = int(sys.argv[5])
     t_cs = int(sys.argv[6])
     alpha = f32(sys.argv[7])
