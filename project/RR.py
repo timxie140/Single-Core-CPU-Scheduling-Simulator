@@ -39,6 +39,7 @@ def RR (process_list, t_cs, t_slice):
 
     CTX = 0
     CTX_stop_time = -1
+    pop_ready_Q = False
 
     preem_ready_q_p = None
 
@@ -95,16 +96,6 @@ def RR (process_list, t_cs, t_slice):
 
             if alive_process == 0:
                 break                   #Means the whole RR algo is done(It's the last context switch after the last process is terminated)
-
-        #Determine if the process arrival time is reached, then add it to the ready queue
-        while len(RR_process_list) != 0 and RR_process_list[0].get_arrival_time() == time:
-            p = RR_process_list.pop(0)
-            ready_Q.append(p)
-            #when it's added to the ready queue, set the turnaround start time
-            p.set_turnaround_start(time)
-
-            if time < print_time_limit:
-                print("time {}ms: Process {} arrived; added to ready queue {}".format(time, p.get_pid(), print_ready_Q(ready_Q)))
         
         #Difference with FCFS, RR will run the process for a time slice
         if RUNNING == 1 and cpu_p.get_expire(time) and cpu_p.get_cpu_burst_stop_time() != time and CTX == 0:
@@ -207,7 +198,8 @@ def RR (process_list, t_cs, t_slice):
                                                                                                                    cpu_p.get_cpu_burst_time(0), print_ready_Q(ready_Q)))
                     cpu_p.set_remaining_time(-1)
             else:
-                cpu_p = ready_Q.pop(0)
+                pop_ready_Q = True
+                cpu_p = ready_Q[0]
                 CTX = 1
                 if io_p != None and io_p.get_pid() == cpu_p.get_pid() and time - io_p.get_io_burst_stop_time() <= half_t_cs:
                     CTX_stop_time = time + half_t_cs - 1
@@ -229,7 +221,24 @@ def RR (process_list, t_cs, t_slice):
             io_p.change_io_burst()
             if time < print_time_limit:
                 print("time {}ms: Process {} completed I/O; added to ready queue {}".format(time, io_p.get_pid(), print_ready_Q(ready_Q)))
-          
+        
+        #Determine if the process arrival time is reached, then add it to the ready queue
+        while len(RR_process_list) != 0 and RR_process_list[0].get_arrival_time() == time:
+            p = RR_process_list.pop(0)
+            ready_Q.append(p)
+            #when it's added to the ready queue, set the turnaround start time
+            p.set_turnaround_start(time)
+
+            if time < print_time_limit:
+                print("time {}ms: Process {} arrived; added to ready queue {}".format(time, p.get_pid(), print_ready_Q(ready_Q)))
+            
+            if RUNNING == 0 and cpu_p == None:
+                time -= 1
+
+        if pop_ready_Q:
+            ready_Q.pop(0)
+            pop_ready_Q = False
+
         time += 1
         
     print("time {}ms: Simulator ended for RR {}".format(time, print_ready_Q(ready_Q)))

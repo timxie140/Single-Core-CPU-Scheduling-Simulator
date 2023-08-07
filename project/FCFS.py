@@ -1,5 +1,4 @@
 from copy import deepcopy
-import math
 
 print_time_limit = 10000
 
@@ -82,15 +81,6 @@ def FCFS (process_list, t_cs):
                 CTX_stop_time = -1      #Means this is the process cpu burst end context switch
             if alive_process == 0:
                 break
-                
-        #Determine if the process arrival time is reached, then add it to the ready queue
-        while len(FCFS_process_list) != 0 and FCFS_process_list[0].get_arrival_time() == time:
-            p = FCFS_process_list.pop(0)
-            ready_Q.append(p)
-            #when it's added to the ready queue, set the turnaround start time
-            p.set_turnaround_start(time)
-            if time < print_time_limit:
-                print("time {}ms: Process {} arrived; added to ready queue {}".format(time, p.get_pid(), print_ready_Q(ready_Q)))
         
         #Determine if the CPU is running, and the CPU burst is finished, then change the CPU burst
         if RUNNING == 1 and cpu_p.get_cpu_burst_stop_time() == time and CTX == 0:
@@ -173,6 +163,18 @@ def FCFS (process_list, t_cs):
             
             if time < print_time_limit:
                 print("time {}ms: Process {} completed I/O; added to ready queue {}".format(time, io_p.get_pid(), print_ready_Q(ready_Q)))
+        
+
+        #Determine if the process arrival time is reached, then add it to the ready queue
+        while len(FCFS_process_list) != 0 and FCFS_process_list[0].get_arrival_time() == time:
+            p = FCFS_process_list.pop(0)
+            ready_Q.append(p)
+            #when it's added to the ready queue, set the turnaround start time
+            p.set_turnaround_start(time)
+            if time < print_time_limit:
+                print("time {}ms: Process {} arrived; added to ready queue {}".format(time, p.get_pid(), print_ready_Q(ready_Q)))
+            if RUNNING == 0 and cpu_p == None:
+                time -= 1
             
         time += 1
     print("time {}ms: Simulator ended for FCFS {}\n".format(time, print_ready_Q(ready_Q)))
