@@ -1,3 +1,7 @@
+import os
+os.environ['OPENBLAS_NUM_THREADS'] = '1'
+
+from numpy import float32 as f32
 from math import ceil
 from copy import deepcopy
 
@@ -21,7 +25,7 @@ def find_shortest_tau(Q):
     return process_index
 
 def find_new_tau(alpha, old_tau, burst_time):
-    result = (alpha * (burst_time)) + ((1 - alpha) * (old_tau))
+    result = (alpha * f32(burst_time)) + ((1 - alpha) * f32(old_tau))
     return ceil((result))
 
 def find_complete_IO(time, io_p):
