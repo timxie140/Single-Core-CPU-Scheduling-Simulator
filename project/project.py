@@ -138,7 +138,7 @@ if n < 0 or ncpu < 0 or alpha < 0 or t_cs < 0:
     print("ERROR: Invalid input either number of processes(arg1), number of cpu-bound processes(arg2), alpha number(arg7/range between 0 to 1), or context switch time(arg6) is negative please use non-negative integer", file=sys.stderr)
     sys.exit(1)
 
-if t_cs % 2 != 0:
+if t_cs % 2 != 0 or t_slice <= 0:
     print("ERROR: Invalid input context switch time(arg6) must be even positive integer", file=sys.stderr)
     sys.exit(1)
 
@@ -154,7 +154,7 @@ if alpha > 1:
     print("ERROR: Invalid input alpha number(arg7) is greater than 1 please use number between 0 and 1", file=sys.stderr)
     sys.exit(1)
 
-if _lambda <= 0 or upperLimit <= 0 or t_slice <= 0:
+if _lambda <= 0 or upperLimit <= 0:
     print("ERROR: Invalid input lambda(arg4) or(and) upperlimit(arg5) or(and) time slice(arg8) must be positive", file=sys.stderr)
     sys.exit(1)
 
