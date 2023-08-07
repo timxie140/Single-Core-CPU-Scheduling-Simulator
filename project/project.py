@@ -135,7 +135,7 @@ except (IndexError, ValueError):
 
 #Check if the input is in the valid range
 if n < 0 or ncpu < 0 or upperLimit < 0 or alpha < 0:
-    print("ERROR: Invalid input either number of processes(arg1), number of cpu-bound processes(arg2), upperLimit(arg5) or alpha number(arg7/range between 0 to 1) is negative please use positive integer", file=sys.stderr)
+    print("ERROR: Invalid input either number of processes(arg1), number of cpu-bound processes(arg2), upperLimit(arg5) or alpha number(arg7/range between 0 to 1) is negative please use non-negative integer", file=sys.stderr)
     sys.exit(1)
 
 if ncpu > n:
@@ -144,6 +144,14 @@ if ncpu > n:
 
 if alpha > 1:
     print("ERROR: Invalid input alpha number(arg7) is greater than 1 please use number between 0 and 1", file=sys.stderr)
+    sys.exit(1)
+
+if _lambda <= 0:
+    print("ERROR: Invalid input lambda(arg4) must be positive", file=sys.stderr)
+    sys.exit(1)
+
+if t_slice == 0:
+    print("ERROR: Invalid input time slice(arg8) can't be 0", file=sys.stderr)
     sys.exit(1)
 
 #create random number generator
