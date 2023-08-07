@@ -95,16 +95,7 @@ def SJF(process_list, t_cs, alpha):
 
     while(living_p!= 0):
         #CPU_PART
-        if len(arr_list) != 0:
-            if arr_list[0].get_arrival_time() == cur_time:
-                arr_list[0].set_turnaround_start(cur_time)  #set start of turnaround time 
-                Q.append(arr_list[0])
-                Q.sort(key=lambda x: x.get_pid())
-                Q.sort(key=lambda x: x.get_tau())
-                if(cur_time<10000):
-                    print("time {}ms: Process {} (tau {}ms) arrived; added to ready queue {}".format(cur_time,arr_list[0].get_pid(),arr_list[0].get_tau(),print_ready_Q(Q)))
-                arr_list.pop(0)
-                continue
+
         if context_status !=1:
             if cpu_p != None:
                 if cur_time == cpu_p.get_cpu_burst_stop_time():
@@ -206,8 +197,21 @@ def SJF(process_list, t_cs, alpha):
                     print("time {}ms: Process {} (tau {}ms) completed I/O; added to ready queue {}".format(cur_time, io_p[index].get_pid(), io_p[index].get_tau(), print_ready_Q(Q)))
                 
                 io_p.pop(index)
-                
+
+        if len(arr_list) != 0:
+            if arr_list[0].get_arrival_time() == cur_time:
+                arr_list[0].set_turnaround_start(cur_time)  #set start of turnaround time 
+                Q.append(arr_list[0])
+                Q.sort(key=lambda x: x.get_pid())
+                Q.sort(key=lambda x: x.get_tau())
+                if(cur_time<10000):
+                    print("time {}ms: Process {} (tau {}ms) arrived; added to ready queue {}".format(cur_time,arr_list[0].get_pid(),arr_list[0].get_tau(),print_ready_Q(Q)))
+                arr_list.pop(0)
+                continue
+
         cur_time += 1
+             
+        
 
     if context_status == 1:
         cur_time+=half_t_cs

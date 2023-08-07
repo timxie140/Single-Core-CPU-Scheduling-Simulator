@@ -47,7 +47,24 @@ def io_process(io_p, cur_time, Q):
             if(cur_time<10000):
                 print("time {}ms: Process {} (tau {}ms) completed I/O; added to ready queue {}".format(cur_time, io_p[index].get_pid(), io_p[index].get_tau(), print_ready_Q(Q)))
             io_p.pop(index)
-    
+
+def arr_process(arr_list, cur_time, Q, burst_times):
+    if len(arr_list) != 0:
+        if arr_list[0].get_arrival_time() == cur_time:
+            arr_list[0].set_turnaround_start(cur_time)  #set start of turnaround time 
+            Q.append(arr_list[0])
+            Q.sort(key=lambda x: x.get_pid())
+            Q.sort(key=lambda x: x.get_predict_time())
+
+            burst_times+=arr_list[0].get_cpu_burst_times()
+            if arr_list[0].get_ID() == "CPU-bound":
+                cpu_B_burst_times+=arr_list[0].get_cpu_burst_times()
+            else:
+                io_B_burst_times+=arr_list[0].get_cpu_burst_times()
+            if(cur_time<10000):
+                print("time {}ms: Process {} (tau {}ms) arrived; added to ready queue {}".format(cur_time,arr_list[0].get_pid(),arr_list[0].get_tau(),print_ready_Q(Q)))
+            arr_list.pop(0)
+
 def SRT(process_list, t_cs, alpha):
     half_t_cs = t_cs // 2
     cpu_p = None
@@ -98,23 +115,7 @@ def SRT(process_list, t_cs, alpha):
     cpu_B_burst_times = 0
     io_B_burst_times = 0
     while(living_p!= 0):
-        #ARR_PART
-        if len(arr_list) != 0:
-            if arr_list[0].get_arrival_time() == cur_time:
-                arr_list[0].set_turnaround_start(cur_time)  #set start of turnaround time 
-                Q.append(arr_list[0])
-                Q.sort(key=lambda x: x.get_pid())
-                Q.sort(key=lambda x: x.get_predict_time())
-
-                burst_times+=arr_list[0].get_cpu_burst_times()
-                if arr_list[0].get_ID() == "CPU-bound":
-                    cpu_B_burst_times+=arr_list[0].get_cpu_burst_times()
-                else:
-                    io_B_burst_times+=arr_list[0].get_cpu_burst_times()
-                if(cur_time<10000):
-                    print("time {}ms: Process {} (tau {}ms) arrived; added to ready queue {}".format(cur_time,arr_list[0].get_pid(),arr_list[0].get_tau(),print_ready_Q(Q)))
-                arr_list.pop(0)
-                continue
+        
         #CPU_PART
         if context_status != 1:
             if cpu_p != None:
@@ -241,13 +242,15 @@ def SRT(process_list, t_cs, alpha):
 
             for i in range(half_t_cs):
                 io_process(io_p,cur_time+i, Q)
+                arr_process(arr_list, cur_time+i, Q, burst_times)
 
             #new switch in
             Q.append(cpu_p)
             Q.sort(key=lambda x: x.get_pid())
             Q.sort(key=lambda x: x.get_predict_time())
 
-            io_process(io_p, cur_time+half_t_cs, Q)
+            io_process(io_p, cur_time + half_t_cs, Q)
+            arr_process(arr_list, cur_time + half_t_cs, Q, burst_times)
 
             cpu_p = Q[0]
             Q.pop(0)
@@ -257,6 +260,7 @@ def SRT(process_list, t_cs, alpha):
 
             for i in range(half_t_cs-1):
                 io_process(io_p,cur_time+half_t_cs+1+i, Q)
+                arr_process(arr_list,cur_time+half_t_cs+1+i, Q, burst_times)
 
             if cpu_p.get_remaining_time() == -1:
                 if cur_time < 10000:
@@ -310,6 +314,7 @@ def SRT(process_list, t_cs, alpha):
 
                     for i in range(half_t_cs):
                         io_process(io_p,cur_time+i, Q)
+                        arr_process(arr_list, cur_time+i, Q, burst_times)
 
                     
                     #new switch in
@@ -318,6 +323,7 @@ def SRT(process_list, t_cs, alpha):
                     Q.sort(key=lambda x: x.get_predict_time())
 
                     io_process(io_p, cur_time+half_t_cs, Q)
+                    arr_process(arr_list, cur_time+half_t_cs, Q, burst_times)
 
                     cpu_p = Q[0]
                     Q.pop(0)
@@ -327,6 +333,7 @@ def SRT(process_list, t_cs, alpha):
 
                     for i in range(half_t_cs-1):
                         io_process(io_p, cur_time+half_t_cs+1+i, Q)
+                        arr_process(arr_list, cur_time+half_t_cs+1+i, Q, burst_times)
 
                     if cur_time < 10000:
                         print("time {}ms: Process {} (tau {}ms) started using the CPU for {}ms burst {}".format(cur_time+t_cs, cpu_p.get_pid(), cpu_p.get_tau(), cpu_p.get_cpu_burst_time(0), print_ready_Q(Q)))
@@ -348,6 +355,24 @@ def SRT(process_list, t_cs, alpha):
                         print("time {}ms: Process {} (tau {}ms) completed I/O; added to ready queue {}".format(cur_time, io_p[index].get_pid(), io_p[index].get_tau(), print_ready_Q(Q)))
                     
                     io_p.pop(index)
+
+        #ARR_PART
+        if len(arr_list) != 0:
+            if arr_list[0].get_arrival_time() == cur_time:
+                arr_list[0].set_turnaround_start(cur_time)  #set start of turnaround time 
+                Q.append(arr_list[0])
+                Q.sort(key=lambda x: x.get_pid())
+                Q.sort(key=lambda x: x.get_predict_time())
+
+                burst_times+=arr_list[0].get_cpu_burst_times()
+                if arr_list[0].get_ID() == "CPU-bound":
+                    cpu_B_burst_times+=arr_list[0].get_cpu_burst_times()
+                else:
+                    io_B_burst_times+=arr_list[0].get_cpu_burst_times()
+                if(cur_time<10000):
+                    print("time {}ms: Process {} (tau {}ms) arrived; added to ready queue {}".format(cur_time,arr_list[0].get_pid(),arr_list[0].get_tau(),print_ready_Q(Q)))
+                arr_list.pop(0)
+                continue
 
         cur_time += 1
 
