@@ -127,16 +127,23 @@ try:
     _lambda = f32(sys.argv[4])
     upperLimit = int(sys.argv[5])
     t_cs = int(sys.argv[6])
-    alpha = f32(sys.argv[7])
-    
+    alpha = f32(sys.argv[7])   
     t_slice = int(sys.argv[8])
 except (IndexError, ValueError):
     print('ERROR: Usage: python3 project.py (number of process) (number of process bound with cpu) (random seed) (lambda) (upperLimit)', file=sys.stderr)
     sys.exit(1)
 
 #Check if the input is in the valid range
-if n < 0 or ncpu < 0 or upperLimit < 0 or alpha < 0:
-    print("ERROR: Invalid input either number of processes(arg1), number of cpu-bound processes(arg2), upperLimit(arg5) or alpha number(arg7/range between 0 to 1) is negative please use non-negative integer", file=sys.stderr)
+if n < 0 or ncpu < 0 or alpha < 0 or t_cs < 0:
+    print("ERROR: Invalid input either number of processes(arg1), number of cpu-bound processes(arg2), alpha number(arg7/range between 0 to 1), or context switch time(arg6) is negative please use non-negative integer", file=sys.stderr)
+    sys.exit(1)
+
+if t_cs % 2 != 0:
+    print("ERROR: Invalid input context switch time(arg6) must be even positive integer", file=sys.stderr)
+    sys.exit(1)
+
+if n > 26:
+    print("ERROR: Invalid input number of processes(arg1) is greater than 26 please use number between 0 and 26", file=sys.stderr)
     sys.exit(1)
 
 if ncpu > n:
@@ -147,12 +154,8 @@ if alpha > 1:
     print("ERROR: Invalid input alpha number(arg7) is greater than 1 please use number between 0 and 1", file=sys.stderr)
     sys.exit(1)
 
-if _lambda <= 0:
-    print("ERROR: Invalid input lambda(arg4) must be positive", file=sys.stderr)
-    sys.exit(1)
-
-if t_slice == 0:
-    print("ERROR: Invalid input time slice(arg8) can't be 0", file=sys.stderr)
+if _lambda <= 0 or upperLimit <= 0 or t_slice <= 0:
+    print("ERROR: Invalid input lambda(arg4) or(and) upperlimit(arg5) or(and) time slice(arg8) must be positive", file=sys.stderr)
     sys.exit(1)
 
 #create random number generator
