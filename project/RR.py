@@ -201,10 +201,7 @@ def RR (process_list, t_cs, t_slice):
                 pop_ready_Q = True
                 cpu_p = ready_Q[0]
                 CTX = 1
-                if io_p != None and io_p.get_pid() == cpu_p.get_pid() and time - io_p.get_io_burst_stop_time() <= half_t_cs:
-                    CTX_stop_time = time + half_t_cs - 1
-                else:
-                    CTX_stop_time = time + half_t_cs
+                CTX_stop_time = time + half_t_cs
 
                 #when process is switching into CPU context switch happens, the second half of the context switch is done
                 context_switch += 0.5
@@ -221,6 +218,8 @@ def RR (process_list, t_cs, t_slice):
             io_p.change_io_burst()
             if time < print_time_limit:
                 print("time {}ms: Process {} completed I/O; added to ready queue {}".format(time, io_p.get_pid(), print_ready_Q(ready_Q)))
+            if RUNNING == 0 and cpu_p == None:
+                time -= 1
         
         #Determine if the process arrival time is reached, then add it to the ready queue
         while len(RR_process_list) != 0 and RR_process_list[0].get_arrival_time() == time:

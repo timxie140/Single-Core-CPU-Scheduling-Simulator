@@ -29,6 +29,7 @@ def FCFS (process_list, t_cs):
 
     CTX = 0
     CTX_stop_time = -1
+    pop_ready_Q = False
 
     #Below is the variables used to calculate the data
     fcfs_total_cpu_burst_times = 0
@@ -86,8 +87,9 @@ def FCFS (process_list, t_cs):
         if RUNNING == 1 and cpu_p.get_cpu_burst_stop_time() == time and CTX == 0:
             cpu_p.change_cpu_burst()
             RUNNING = 0
-            if time < print_time_limit and cpu_p.get_cpu_burst_times() != 0:
-                print("time {}ms: Process {} completed a CPU burst; {} burst{} to go {}".format(time, cpu_p.get_pid(), cpu_p.get_cpu_burst_times(), 's' if cpu_p.get_cpu_burst_times() > 1 else '', print_ready_Q(ready_Q)))
+            if time < print_time_limit:
+                if cpu_p.get_cpu_burst_times() != 0:
+                    print("time {}ms: Process {} completed a CPU burst; {} burst{} to go {}".format(time, cpu_p.get_pid(), cpu_p.get_cpu_burst_times(), 's' if cpu_p.get_cpu_burst_times() > 1 else '', print_ready_Q(ready_Q)))
             
             #Determine if the process should be terminated, then add it to the finished list, by checking if there's cpu burst times left
             if cpu_p.get_cpu_burst_times() == 0:
@@ -126,7 +128,7 @@ def FCFS (process_list, t_cs):
                 if ready_Q and ready_Q[0].get_pid() != io_p.get_pid():
                     CTX = 1
                     CTX_stop_time = time + half_t_cs               
-
+        
         #Determine if the CPU is free, and there's process in the ready queue, then start the process
         if RUNNING == 0 and (len(ready_Q) != 0 or cpu_p != None) and CTX == 0:
             if CTX_stop_time == -2:
@@ -138,12 +140,11 @@ def FCFS (process_list, t_cs):
                 if time < print_time_limit:
                     print("time {}ms: Process {} started using the CPU for {}ms burst {}".format(time, cpu_p.get_pid(), cpu_p.get_cpu_burst_time(0), print_ready_Q(ready_Q)))
             else:
-                cpu_p = ready_Q.pop(0)
+                pop_ready_Q = True
+                cpu_p = ready_Q[0]
                 CTX = 1
-                if io_p != None and io_p.get_pid() == cpu_p.get_pid() and time - io_p.get_io_burst_stop_time() <= half_t_cs:
-                    CTX_stop_time = time + half_t_cs - 1
-                else:
-                    CTX_stop_time = time + half_t_cs
+
+                CTX_stop_time = time + half_t_cs
 
                 #when process is switching into CPU context switch happens, the second half of the context switch is done
                 context_switch += 0.5
@@ -160,9 +161,10 @@ def FCFS (process_list, t_cs):
             io_p = io_list.pop(0)
             ready_Q.append(io_p)    
             io_p.change_io_burst()
-            
             if time < print_time_limit:
                 print("time {}ms: Process {} completed I/O; added to ready queue {}".format(time, io_p.get_pid(), print_ready_Q(ready_Q)))
+            if len(ready_Q) == 1 and RUNNING == 0:
+                time -= 1
         
 
         #Determine if the process arrival time is reached, then add it to the ready queue
@@ -175,6 +177,10 @@ def FCFS (process_list, t_cs):
                 print("time {}ms: Process {} arrived; added to ready queue {}".format(time, p.get_pid(), print_ready_Q(ready_Q)))
             if RUNNING == 0 and cpu_p == None:
                 time -= 1
+        
+        if pop_ready_Q:
+            ready_Q.pop(0)
+            pop_ready_Q = False
             
         time += 1
     print("time {}ms: Simulator ended for FCFS {}\n".format(time, print_ready_Q(ready_Q)))
